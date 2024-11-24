@@ -50,6 +50,38 @@ Orchestrates the conversion process:
 3. The script reads your Pipfile and generates an environment.yml
 4. The temporary environment is removed
 
+#### Sequence diagram for Pipfile to Conda environment conversion process
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Makefile
+    participant Conda
+    participant Script as convert_pipfile.py
+
+    User->>Makefile: make environment.yml
+    Makefile->>Conda: Create temporary environment
+    Makefile->>Conda: Activate environment
+    Makefile->>Script: Run conversion script
+    Script->>Conda: Read Pipfile
+    Script->>Conda: Generate environment.yml
+    Makefile->>Conda: Deactivate environment
+    Makefile->>Conda: Remove temporary environment
+    User->>Makefile: make clean
+    Makefile->>Conda: Remove environment.yml
+    Makefile->>Conda: Remove temporary environment
+```
+
+### File-Level Changes
+
+| Change | Details | Files |
+| ------ | ------- | ----- |
+| Implementation of the Pipfile to conda environment converter script | <ul><li>Parses Pipfile using toml library</li><li>Generates conda environment structure with conda-forge and defaults channels</li><li>Preserves Python version requirements from Pipfile</li><li>Handles package version specifications</li><li>Supports fallback to pip packages when needed</li></ul> | `convert_pipfile.py` |
+| Creation of build environment specification for the converter | <ul><li>Defines minimal conda environment with required dependencies</li><li>Specifies Python 3.10 as the base interpreter</li><li>Includes pyyaml and toml as dependencies</li></ul> | `convert_pipfile.yml` |
+| Implementation of automated build process | <ul><li>Creates temporary conda environment for conversion</li><li>Manages environment activation and deactivation</li><li>Provides clean-up functionality</li><li>Ensures reproducible builds through make targets</li></ul> | `Makefile` |
+| Documentation of the conversion process and usage | <ul><li>Explains solution components and their purposes</li><li>Details the conversion workflow</li><li>Provides usage instructions</li><li>Lists key requirements and constraints</li></ul> | `convert_pipfile.md` |
+| Addition of example converted environment file | <ul><li>Demonstrates converted environment structure</li><li>Shows channel configuration</li><li>Lists converted package dependencies</li></ul> | `environment.yml` |
+
 ## Usage
 
 To generate environment.yml:
