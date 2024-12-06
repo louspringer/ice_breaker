@@ -1,14 +1,28 @@
 name: ice_breaker
 channels:
-- conda-forge
-- defaults
+  - conda-forge
+  - defaults
 dependencies:
-- python=3.10
-- flask
-- tweepy
-- pylint
-- black
-- isort
-- langchain
-- langchain-community
-- langchain-openai
+  - _libgcc_mutex
+  - _openmp_mutex
+  - aiohttp
+  - attrs
+  - babel
+  - beautifulsoup4
+  - black
+  - cryptography
+  - flask
+  - jinja2
+  - langchain
+  - numpy
+  - pandas
+  - requests
+  - sqlalchemy
+  - wheel
+  - pip:
+      - linkedin-api
+      - selenium
+      - sortedcontainers
+      - webdriver-manager
+      - chromedriver-binary
+prefix: /home/ubuntu/anaconda3/envs/ice_breaker
