@@ -1,0 +1,175 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
+@prefix problem: <./problem#> .
+@prefix solution: <./solution#> .
+@prefix conversation: <./conversation#> .
+@prefix map: <./ontology_sql_mappings#> .
+@prefix icebreaker: <./icebreaker#> .
+
+# Mapping Ontology
+map:SQLMappingOntology rdf:type owl:Ontology ;
+    rdfs:label "SQL Mapping Ontology" ;
+    rdfs:comment "Defines mappings between ontology entities and SQL schema objects" .
+
+# Classes
+map:SQLMapping rdf:type owl:Class ;
+    rdfs:subClassOf meta:Mapping ;
+    rdfs:label "SQL Mapping" ;
+    rdfs:comment "Defines mappings between ontology elements and SQL database structures" .
+
+map:TableMapping rdfs:subClassOf map:SQLMapping ;
+    rdfs:label "Table Mapping" ;
+    rdfs:comment "Maps an ontology class to a SQL table" .
+
+map:ColumnMapping rdfs:subClassOf map:SQLMapping ;
+    rdfs:label "Column Mapping" ;
+    rdfs:comment "Maps an ontology property to a SQL column" .
+
+# Properties
+map:hasTableName rdf:type owl:DatatypeProperty ;
+    rdfs:label "has table name" ;
+    rdfs:comment "Specifies the SQL table name for an ontology element" ;
+    rdfs:domain map:SQLMapping ;
+    rdfs:range xsd:string .
+
+map:hasColumnName rdf:type owl:DatatypeProperty ;
+    rdfs:label "has column name" ;
+    rdfs:comment "Specifies the SQL column name for an ontology property" ;
+    rdfs:domain map:SQLMapping ;
+    rdfs:range xsd:string .
+
+map:hasDataType rdf:type owl:DatatypeProperty ;
+    rdfs:label "has SQL data type" ;
+    rdfs:comment "Specifies the SQL data type for a property" ;
+    rdfs:domain map:SQLMapping ;
+    rdfs:range xsd:string .
+
+# Mappings for Contact/Person
+map:ContactMapping rdf:type map:TableMapping ;
+    rdfs:label "Contact Table Mapping" ;
+    map:hasTableName "NETWORKING.CONTACTS" ;
+    map:mapsClass icebreaker:Contact ;
+    map:denormalizedFrom meta:Person ;
+    map:hasColumns (
+        map:ContactIdColumn
+        map:FullNameColumn
+        map:TitleColumn
+        map:LocationColumn
+        map:ContactEmailColumn
+        map:LinkedInUrlColumn
+        map:MutualConnectionsColumn
+        map:NetworkingDegreeColumn
+    ) .
+
+map:ContactIdColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "contact_id" ;
+    map:hasDataType "NUMBER" ;
+    map:isPrimaryKey true .
+
+map:FullNameColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "full_name" ;
+    map:hasDataType "VARCHAR(255)" ;
+    map:mapsProperty icebreaker:fullName .
+
+map:TitleColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "title" ;
+    map:hasDataType "VARCHAR(500)" .
+
+map:LocationColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "location" ;
+    map:hasDataType "VARCHAR(255)" .
+
+map:ContactEmailColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "contact_email" ;
+    map:hasDataType "VARCHAR(255)" ;
+    map:mapsProperty icebreaker:contactEmail .
+
+map:LinkedInUrlColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "linkedin_url" ;
+    map:hasDataType "VARCHAR(500)" ;
+    map:mapsProperty icebreaker:linkedInURL .
+
+map:MutualConnectionsColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "mutual_connections" ;
+    map:hasDataType "VARCHAR(1000)" .
+
+map:NetworkingDegreeColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "networking_degree" ;
+    map:hasDataType "VARCHAR(50)" ;
+    map:mapsProperty icebreaker:hasNetworkingDegree .
+
+# Temporal Tracking Mappings
+map:ContactsStreamMapping rdf:type map:TableMapping ;
+    rdfs:label "Contacts Stream Mapping" ;
+    map:hasTableName "NETWORKING.CONTACTS_STREAM" ;
+    map:mapsClass icebreaker:TemporalTracking ;
+    map:hasColumns (
+        map:StreamMetadataColumn
+        map:ChangeTypeColumn
+        map:ChangeTimestampColumn
+    ) .
+
+map:StreamMetadataColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "METADATA$ACTION" ;
+    map:hasDataType "VARCHAR" ;
+    map:mapsProperty icebreaker:changeType .
+
+map:ChangeTimestampColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "METADATA$ROW_ID" ;
+    map:hasDataType "NUMBER" ;
+    map:mapsProperty icebreaker:changeTimestamp .
+
+# Data Quality Mappings
+map:ContactQualityMapping rdf:type map:TableMapping ;
+    rdfs:label "Contact Quality Mapping" ;
+    map:hasTableName "NETWORKING.CONTACT_QUALITY" ;
+    map:mapsClass icebreaker:DataQuality ;
+    map:hasColumns (
+        map:ContactIdColumn
+        map:ConfidenceScoreColumn
+        map:LastVerifiedColumn
+        map:DataSourceColumn
+    ) .
+
+map:ConfidenceScoreColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "confidence_score" ;
+    map:hasDataType "DECIMAL(5,2)" ;
+    map:mapsProperty icebreaker:confidenceScore .
+
+map:LastVerifiedColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "last_verified_date" ;
+    map:hasDataType "TIMESTAMP_TZ" ;
+    map:mapsProperty icebreaker:lastVerifiedDate .
+
+# Integration Metadata Mappings
+map:IntegrationMapping rdf:type map:TableMapping ;
+    rdfs:label "Integration Metadata Mapping" ;
+    map:hasTableName "NETWORKING.INTEGRATION_STATUS" ;
+    map:mapsClass icebreaker:IntegrationMetadata ;
+    map:hasColumns (
+        map:ContactIdColumn
+        map:ExternalSourceColumn
+        map:SyncStatusColumn
+        map:LastSyncColumn
+    ) .
+
+map:ExternalSourceColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "external_source" ;
+    map:hasDataType "VARCHAR(100)" ;
+    map:mapsProperty icebreaker:externalSource .
+
+map:SyncStatusColumn rdf:type map:ColumnMapping ;
+    map:hasColumnName "sync_status" ;
+    map:hasDataType "VARCHAR(50)" ;
+    map:mapsProperty icebreaker:syncStatus .
+
+# TODO: Add mappings for future tables
+# - InteractionPoint
+# - ResearchInsight
+# - CommonGround
+# - BusinessNeed
+# - NetworkingStrategy 

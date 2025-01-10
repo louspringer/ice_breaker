@@ -3,13 +3,16 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+# Local ontology prefixes
 @prefix prob: <./problem#> .
 @prefix sol: <./solution#> .
 @prefix conversation: <./conversation#> .
 @prefix meta: <./meta#> .
 @prefix metameta: <./metameta#> .
 @prefix icebreaker: <./icebreaker#> .
-@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix map: <./map#> .
 
 icebreaker:IcebreakerOntology rdf:type owl:Ontology ;
     dc:title "Icebreaker Ontology" ;
@@ -19,6 +22,7 @@ icebreaker:IcebreakerOntology rdf:type owl:Ontology ;
     owl:imports <./solution> ;
     owl:imports <./meta> ;
     owl:imports <./metameta> ;
+    owl:imports <./imported_ontology_extensions> ;
     owl:versionInfo "Updated with SHACL shapes and OWL restrictions" .
 
 # Core Classes with Enhanced Definitions
@@ -143,6 +147,88 @@ icebreaker:SecondDegree rdf:type icebreaker:NetworkingDegree, owl:NamedIndividua
     rdfs:comment "Connection through one intermediary" ;
     meta:priority "2"^^xsd:integer .
 
+# Temporal Tracking
+icebreaker:TemporalTracking rdf:type owl:Class ;
+    rdfs:label "Temporal Tracking" ;
+    rdfs:comment "Tracks changes to entities over time" ;
+    rdfs:subClassOf meta:Tracking .
+
+icebreaker:hasChangeStream rdf:type owl:ObjectProperty ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range icebreaker:TemporalTracking ;
+    rdfs:label "has change stream" ;
+    rdfs:comment "Links a contact to its change history stream" .
+
+icebreaker:changeTimestamp rdf:type owl:DatatypeProperty ;
+    rdfs:domain icebreaker:TemporalTracking ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "change timestamp" ;
+    rdfs:comment "When a change occurred" .
+
+icebreaker:changeType rdf:type owl:DatatypeProperty ;
+    rdfs:domain icebreaker:TemporalTracking ;
+    rdfs:range xsd:string ;
+    rdfs:label "change type" ;
+    rdfs:comment "Type of change (INSERT, UPDATE, DELETE)" .
+
+# Enhanced Temporal Tracking
+icebreaker:VersionChain rdf:type owl:Class ;
+    rdfs:subClassOf icebreaker:TemporalTracking ;
+    rdfs:label "Version Chain" ;
+    rdfs:comment "Links successive versions of an entity" .
+
+icebreaker:ChangeContext rdf:type owl:Class ;
+    rdfs:label "Change Context" ;
+    rdfs:comment "Captures the context and reason for changes" .
+
+icebreaker:changedBy rdf:type owl:ObjectProperty ;
+    rdfs:domain icebreaker:TemporalTracking ;
+    rdfs:range meta:Agent ;
+    rdfs:label "changed by" .
+
+# Relationship Evolution
+icebreaker:RelationshipTransition rdf:type owl:Class ;
+    rdfs:label "Relationship Transition" ;
+    rdfs:comment "Records changes in relationship status/degree" .
+
+icebreaker:ContactStatus rdf:type owl:Class ;
+    rdfs:label "Contact Status" ;
+    rdfs:comment "Tracks if contact is active, inactive, or archived" .
+
+icebreaker:relationshipStrength rdf:type owl:DatatypeProperty ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "relationship strength" .
+
+# Data Quality
+icebreaker:DataQuality rdf:type owl:Class ;
+    rdfs:label "Data Quality" ;
+    rdfs:comment "Metrics and indicators for data quality" .
+
+icebreaker:confidenceScore rdf:type owl:DatatypeProperty ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "confidence score" .
+
+icebreaker:lastVerifiedDate rdf:type owl:DatatypeProperty ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "last verified date" .
+
+# Integration Tracking
+icebreaker:IntegrationMetadata rdf:type owl:Class ;
+    rdfs:label "Integration Metadata" ;
+    rdfs:comment "Tracks synchronization with external systems" .
+
+icebreaker:ExternalSource rdf:type owl:Class ;
+    rdfs:label "External Source" ;
+    rdfs:comment "External system or data source" .
+
+icebreaker:syncStatus rdf:type owl:DatatypeProperty ;
+    rdfs:domain icebreaker:IntegrationMetadata ;
+    rdfs:range xsd:string ;
+    rdfs:label "sync status" .
+
 # TODO Section with Specific Tasks
 # 1. Add more SHACL shapes for validation of interaction quality
 # 2. Develop patterns for measuring networking effectiveness
@@ -152,3 +238,227 @@ icebreaker:SecondDegree rdf:type icebreaker:NetworkingDegree, owl:NamedIndividua
 # 6. Develop temporal aspects for follow-up scheduling
 # 7. Add sentiment analysis for interaction outcomes
 # 8. Expand common ground categories and classification 
+
+# Core Class Hierarchy
+meta:Person rdfs:subClassOf owl:Thing .
+meta:Position rdfs:subClassOf meta:AbstractConcept .
+meta:AbstractionDimension rdfs:subClassOf metameta:AbstractionDimension .
+
+# Base Classes
+meta:AbstractConcept rdfs:subClassOf owl:Thing ;
+    rdfs:label "Abstract Concept" ;
+    rdfs:comment "Root class for abstract concepts in the domain" .
+
+meta:Tracking rdfs:subClassOf owl:Thing ;
+    rdfs:label "Tracking" ;
+    rdfs:comment "Root class for tracking changes and history" .
+
+meta:Quality rdfs:subClassOf owl:Thing ;
+    rdfs:label "Quality" ;
+    rdfs:comment "Root class for quality metrics and measures" .
+
+meta:Metadata rdfs:subClassOf owl:Thing ;
+    rdfs:label "Metadata" ;
+    rdfs:comment "Root class for metadata concepts" .
+
+meta:Source rdfs:subClassOf owl:Thing ;
+    rdfs:label "Source" ;
+    rdfs:comment "Root class for data sources" .
+
+meta:Status rdfs:subClassOf owl:Thing ;
+    rdfs:label "Status" ;
+    rdfs:comment "Root class for status concepts" .
+
+meta:Transition rdfs:subClassOf owl:Thing ;
+    rdfs:label "Transition" ;
+    rdfs:comment "Root class for state transitions" .
+
+meta:Context rdfs:subClassOf owl:Thing ;
+    rdfs:label "Context" ;
+    rdfs:comment "Root class for contextual information" .
+
+# Enhanced Temporal Tracking with Hierarchy
+icebreaker:TemporalTracking rdfs:subClassOf meta:Tracking .
+icebreaker:VersionChain rdfs:subClassOf icebreaker:TemporalTracking .
+icebreaker:ChangeContext rdfs:subClassOf meta:Context .
+icebreaker:TemporalEvent rdfs:subClassOf icebreaker:TemporalTracking .
+
+# Data Quality Hierarchy
+icebreaker:DataQuality rdfs:subClassOf meta:Quality .
+
+# Integration and Status Classes
+icebreaker:IntegrationMetadata rdfs:subClassOf meta:Metadata .
+icebreaker:ExternalSource rdfs:subClassOf meta:Source .
+icebreaker:ContactStatus rdfs:subClassOf meta:Status .
+icebreaker:RelationshipTransition rdfs:subClassOf meta:Transition .
+
+# Property Labels
+meta:hasLevel rdfs:label "has level" .
+prob:hasContext rdfs:label "has context" .
+prob:hasConstraint rdfs:label "has constraint" .
+sol:satisfies rdfs:label "satisfies" .
+sol:hasImplementation rdfs:label "has implementation" .
+sol:hasValidation rdfs:label "has validation" .
+metameta:levelNumber rdfs:label "level number" .
+metameta:domainScope rdfs:label "domain scope" .
+prob:hasValue rdfs:label "has value" .
+prob:hasPriority rdfs:label "has priority" .
+sol:validationStatus rdfs:label "validation status" .
+map:hasTableName rdfs:label "has table name" .
+map:hasColumnName rdfs:label "has column name" .
+map:hasDataType rdfs:label "has data type" .
+
+# Class Metadata
+icebreaker:TemporalEvent rdfs:label "Temporal Event" ;
+    rdfs:comment "A specific point in time when a change occurred" .
+
+icebreaker:DataQuality rdfs:label "Data Quality" ;
+    rdfs:comment "Quality metrics for contact data" .
+
+icebreaker:IntegrationMetadata rdfs:label "Integration Metadata" ;
+    rdfs:comment "Metadata for external system integration" .
+
+icebreaker:ExternalSource rdfs:label "External Source" ;
+    rdfs:comment "External system or data provider" .
+
+icebreaker:ContactStatus rdfs:label "Contact Status" ;
+    rdfs:comment "Status of a contact relationship" .
+
+icebreaker:RelationshipTransition rdfs:label "Relationship Transition" ;
+    rdfs:comment "Change in relationship status or degree" .
+
+sol:ValidationStatus rdfs:label "Validation Status" ;
+    rdfs:comment "Status of a validation check" ;
+    rdfs:subClassOf meta:Status .
+
+# Property Labels
+meta:hasLevel rdfs:label "has level" .
+prob:hasContext rdfs:label "has context" .
+prob:hasConstraint rdfs:label "has constraint" .
+sol:satisfies rdfs:label "satisfies" .
+sol:hasImplementation rdfs:label "has implementation" .
+sol:hasValidation rdfs:label "has validation" .
+metameta:levelNumber rdfs:label "level number" .
+metameta:domainScope rdfs:label "domain scope" .
+prob:hasValue rdfs:label "has value" .
+prob:hasPriority rdfs:label "has priority" .
+sol:validationStatus rdfs:label "validation status" .
+map:hasTableName rdfs:label "has table name" .
+map:hasColumnName rdfs:label "has column name" .
+map:hasDataType rdfs:label "has data type" .
+
+# Temporal Tracking Subclasses
+icebreaker:ContactChangeEvent rdfs:subClassOf icebreaker:TemporalEvent ;
+    rdfs:label "Contact Change Event" ;
+    rdfs:comment "A change event related to a contact" .
+
+icebreaker:RelationshipChangeEvent rdfs:subClassOf icebreaker:TemporalEvent ;
+    rdfs:label "Relationship Change Event" ;
+    rdfs:comment "A change event related to a relationship" .
+
+icebreaker:ContactVersionChain rdfs:subClassOf icebreaker:VersionChain ;
+    rdfs:label "Contact Version Chain" ;
+    rdfs:comment "Version history for a contact" .
+
+icebreaker:RelationshipVersionChain rdfs:subClassOf icebreaker:VersionChain ;
+    rdfs:label "Relationship Version Chain" ;
+    rdfs:comment "Version history for a relationship" .
+
+icebreaker:ContactChangeContext rdfs:subClassOf icebreaker:ChangeContext ;
+    rdfs:label "Contact Change Context" ;
+    rdfs:comment "Context for contact-related changes" .
+
+icebreaker:RelationshipChangeContext rdfs:subClassOf icebreaker:ChangeContext ;
+    rdfs:label "Relationship Change Context" ;
+    rdfs:comment "Context for relationship-related changes" .
+
+# Temporal Tracking Classes
+icebreaker:TemporalTracking rdf:type owl:Class ;
+    rdfs:subClassOf meta:Tracking ;
+    rdfs:label "Temporal Tracking" ;
+    rdfs:comment "Base class for temporal tracking concepts" .
+
+icebreaker:VersionChain rdf:type owl:Class ;
+    rdfs:subClassOf icebreaker:TemporalTracking ;
+    rdfs:label "Version Chain" ;
+    rdfs:comment "Tracks version history of entities" .
+
+icebreaker:ChangeContext rdf:type owl:Class ;
+    rdfs:subClassOf meta:Context ;
+    rdfs:label "Change Context" ;
+    rdfs:comment "Provides context for temporal changes" .
+
+icebreaker:TemporalEvent rdf:type owl:Class ;
+    rdfs:subClassOf icebreaker:TemporalTracking ;
+    rdfs:label "Temporal Event" ;
+    rdfs:comment "Represents a point-in-time event" .
+
+# Other class hierarchies
+icebreaker:DataQuality rdfs:subClassOf meta:Quality .
+icebreaker:IntegrationMetadata rdfs:subClassOf meta:Metadata .
+icebreaker:ExternalSource rdfs:subClassOf meta:Source .
+icebreaker:ContactStatus rdfs:subClassOf meta:Status .
+icebreaker:RelationshipTransition rdfs:subClassOf meta:Transition .
+
+# Temporal Tracking Subclasses
+icebreaker:PersonVersionChain rdfs:subClassOf icebreaker:VersionChain ;
+    rdfs:label "Person Version Chain" ;
+    rdfs:comment "Tracks version history of person entities" .
+
+icebreaker:ContactChangeContext rdfs:subClassOf icebreaker:ChangeContext ;
+    rdfs:label "Contact Change Context" ;
+    rdfs:comment "Context for contact-related changes" .
+
+icebreaker:ProfileUpdateEvent rdfs:subClassOf icebreaker:TemporalEvent ;
+    rdfs:label "Profile Update Event" ;
+    rdfs:comment "Represents a profile update event" .
+
+icebreaker:RelationshipEvent rdfs:subClassOf icebreaker:TemporalEvent ;
+    rdfs:label "Relationship Event" ;
+    rdfs:comment "Represents a relationship-related event" .
+
+icebreaker:DataUpdateContext rdfs:subClassOf icebreaker:ChangeContext ;
+    rdfs:label "Data Update Context" ;
+    rdfs:comment "Context for data update operations" .
+
+icebreaker:CompanyVersionChain rdfs:subClassOf icebreaker:VersionChain ;
+    rdfs:label "Company Version Chain" ;
+    rdfs:comment "Tracks version history of company entities" .
+
+# Core Classes
+icebreaker:TemporalTracking rdfs:subClassOf meta:Tracking .
+icebreaker:DataQuality rdfs:subClassOf meta:Quality .
+icebreaker:IntegrationMetadata rdfs:subClassOf meta:Metadata .
+icebreaker:ExternalSource rdfs:subClassOf meta:Source .
+icebreaker:ContactStatus rdfs:subClassOf meta:Status .
+icebreaker:RelationshipTransition rdfs:subClassOf meta:Transition .
+
+# Temporal Classes
+icebreaker:VersionChain rdfs:subClassOf icebreaker:TemporalTracking .
+icebreaker:ChangeContext rdfs:subClassOf meta:Context .
+icebreaker:TemporalEvent rdfs:subClassOf icebreaker:TemporalTracking .
+
+# Contact Properties
+icebreaker:contactEmail rdf:type owl:DatatypeProperty ;
+    rdfs:label "contact email" ;
+    rdfs:comment "Email address for contacting the person" ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range xsd:string .
+
+icebreaker:linkedInURL rdf:type owl:DatatypeProperty ;
+    rdfs:label "LinkedIn URL" ;
+    rdfs:comment "URL to the person's LinkedIn profile" ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range xsd:string .
+
+icebreaker:externalSource rdf:type owl:DatatypeProperty ;
+    rdfs:label "external source" ;
+    rdfs:comment "Name or identifier of external data source" ;
+    rdfs:domain icebreaker:IntegrationMetadata ;
+    rdfs:range xsd:string .
+
+icebreaker:fullName rdf:type owl:DatatypeProperty ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range xsd:string ;
+    rdfs:label "full name" ;
+    rdfs:comment "The full name of a contact" . 

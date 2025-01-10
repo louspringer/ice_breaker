@@ -1,52 +1,54 @@
-CREATE TABLE Contact (
-    id INTEGER AUTOINCREMENT PRIMARY KEY,
-    fullName STRING,
-    contactEmail STRING,
-    linkedInURL STRING
+-- Create database and role
+CREATE DATABASE IF NOT EXISTS ICE_BREAKER_DB;
+USE DATABASE ICE_BREAKER_DB;
+
+-- Create role with appropriate permissions
+CREATE ROLE IF NOT EXISTS ICE_BREAKER_ROLE;
+GRANT USAGE ON DATABASE ICE_BREAKER_DB TO ROLE ICE_BREAKER_ROLE;
+
+-- Create schema
+CREATE SCHEMA IF NOT EXISTS NETWORKING;
+GRANT USAGE ON SCHEMA NETWORKING TO ROLE ICE_BREAKER_ROLE;
+
+-- Create denormalized CONTACTS table
+CREATE OR REPLACE TABLE NETWORKING.CONTACTS (
+    contact_id NUMBER AUTOINCREMENT START 1 INCREMENT 1,
+    full_name VARCHAR(255) NOT NULL,
+    title VARCHAR(500),
+    location VARCHAR(255),
+    contact_email VARCHAR(255),
+    linkedin_url VARCHAR(500) NOT NULL CONSTRAINT valid_linkedin_url CHECK (linkedin_url LIKE 'https://www.linkedin.com/%'),
+    mutual_connections VARCHAR(1000),
+    networking_degree VARCHAR(50) DEFAULT 'SecondDegree',
+    created_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    updated_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    
+    -- Constraints
+    CONSTRAINT pk_contacts PRIMARY KEY (contact_id),
+    CONSTRAINT unique_linkedin_url UNIQUE (linkedin_url)
 );
 
-CREATE TABLE NetworkingDegree (
-    id INTEGER AUTOINCREMENT PRIMARY KEY,
-    degreeName STRING
-);
+-- Grant permissions
+GRANT SELECT, INSERT, UPDATE ON TABLE NETWORKING.CONTACTS TO ROLE ICE_BREAKER_ROLE;
 
-CREATE TABLE InteractionPoint (
-    id INTEGER AUTOINCREMENT PRIMARY KEY,
-    contactId INTEGER,
-    interactionType STRING,
-    lastInteractionDate TIMESTAMP,
-    FOREIGN KEY (contactId) REFERENCES Contact(id)
-);
+-- Create a stream for change tracking
+CREATE OR REPLACE STREAM NETWORKING.CONTACTS_STREAM ON TABLE NETWORKING.CONTACTS;
 
-CREATE TABLE ResearchInsight (
-    id INTEGER AUTOINCREMENT PRIMARY KEY,
-    contactId INTEGER,
-    insightSource STRING,
-    relevanceScore INTEGER,
-    discoveryDate TIMESTAMP,
-    FOREIGN KEY (contactId) REFERENCES Contact(id)
-);
+-- Comments for documentation
+COMMENT ON TABLE NETWORKING.CONTACTS IS 'Denormalized contacts table containing LinkedIn profile information';
+COMMENT ON COLUMN NETWORKING.CONTACTS.contact_id IS 'Unique identifier for each contact';
+COMMENT ON COLUMN NETWORKING.CONTACTS.networking_degree IS 'Connection degree (FirstDegree, SecondDegree, etc.)';
 
-CREATE TABLE CommonGround (
-    id INTEGER AUTOINCREMENT PRIMARY KEY,
-    contactId INTEGER,
-    description STRING,
-    FOREIGN KEY (contactId) REFERENCES Contact(id)
-);
+-- Create a view for basic contact information
+CREATE OR REPLACE VIEW NETWORKING.VW_CONTACT_SUMMARY AS
+SELECT 
+    contact_id,
+    full_name,
+    title,
+    location,
+    networking_degree,
+    mutual_connections
+FROM NETWORKING.CONTACTS;
 
-CREATE TABLE ContactRequest (
-    id INTEGER AUTOINCREMENT PRIMARY KEY,
-    contactId INTEGER,
-    requestDate TIMESTAMP,
-    requestNote STRING,
-    requestStatus STRING,
-    FOREIGN KEY (contactId) REFERENCES Contact(id)
-);
-
-CREATE TABLE ConnectionRationale (
-    id INTEGER AUTOINCREMENT PRIMARY KEY,
-    contactRequestId INTEGER,
-    rationale STRING,
-    confidenceScore INTEGER,
-    FOREIGN KEY (contactRequestId) REFERENCES ContactRequest(id)
-); 
+-- Grant view access
+GRANT SELECT ON VIEW NETWORKING.VW_CONTACT_SUMMARY TO ROLE ICE_BREAKER_ROLE; 

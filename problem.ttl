@@ -29,19 +29,27 @@ prob:Constraint rdf:type owl:Class ;
 # Core Properties
 prob:hasValue rdf:type owl:DatatypeProperty ;
     rdfs:domain prob:BusinessNeed ;
-    rdfs:range xsd:string .
+    rdfs:range xsd:string ;
+    rdfs:label "has value" ;
+    rdfs:comment "Specifies a value associated with a problem element" .
 
 prob:hasPriority rdf:type owl:DatatypeProperty ;
     rdfs:domain prob:BusinessNeed ;
-    rdfs:range xsd:integer .
+    rdfs:range xsd:integer ;
+    rdfs:label "has priority" ;
+    rdfs:comment "Specifies the priority level of a problem" .
 
 prob:hasContext rdf:type owl:ObjectProperty ;
     rdfs:domain prob:BusinessNeed ;
-    rdfs:range prob:Context .
+    rdfs:range prob:Context ;
+    rdfs:label "has context" ;
+    rdfs:comment "Links a problem to its context" .
 
 prob:hasConstraint rdf:type owl:ObjectProperty ;
     rdfs:domain prob:BusinessNeed ;
-    rdfs:range prob:Constraint .
+    rdfs:range prob:Constraint ;
+    rdfs:label "has constraint" ;
+    rdfs:comment "Links a problem to its constraints" .
 
 # Add validation rules
 prob:BusinessNeed rdfs:subClassOf [

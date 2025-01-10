@@ -3,20 +3,65 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
 
 # Core Classes
 meta:Person rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
     rdfs:label "Person" ;
-    rdfs:comment "A human being" .
+    rdfs:comment "A human individual" .
+
+meta:AbstractConcept rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Abstract Concept" ;
+    rdfs:comment "Base class for abstract concepts" .
 
 meta:Position rdf:type owl:Class ;
+    rdfs:subClassOf meta:AbstractConcept ;
     rdfs:label "Position" ;
     rdfs:comment "A role or position held by a person" .
 
 meta:AbstractionDimension rdf:type owl:Class ;
+    rdfs:subClassOf metameta:AbstractionDimension ;
     rdfs:label "Abstraction Dimension" ;
-    rdfs:comment "A dimension of abstraction in modeling" .
+    rdfs:comment "A dimension along which abstraction can occur" .
+
+# Core Base Classes
+meta:Tracking rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Tracking" ;
+    rdfs:comment "Base class for tracking concepts" .
+
+meta:Quality rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Quality" ;
+    rdfs:comment "Base class for quality concepts" .
+
+meta:Metadata rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Metadata" ;
+    rdfs:comment "Base class for metadata concepts" .
+
+meta:Source rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Source" ;
+    rdfs:comment "Base class for source concepts" .
+
+meta:Status rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Status" ;
+    rdfs:comment "Base class for status concepts" .
+
+meta:Transition rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Transition" ;
+    rdfs:comment "Base class for transition concepts" .
+
+meta:Context rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Context" ;
+    rdfs:comment "Base class for context concepts" .
 
 # Core Properties
 meta:hasPosition rdf:type owl:ObjectProperty ;
@@ -25,9 +70,22 @@ meta:hasPosition rdf:type owl:ObjectProperty ;
     rdfs:label "has position" ;
     owl:maxCardinality "1"^^xsd:nonNegativeInteger .
 
+# Add missing property labels
+meta:hasLevel rdfs:label "has level" .
+meta:hasContext rdfs:label "has context" .
+meta:hasConstraint rdfs:label "has constraint" .
+meta:hasValue rdfs:label "has value" .
+meta:hasPriority rdfs:label "has priority" .
+
 # Core Ontology
 meta:CoreOntology rdf:type owl:Ontology ;
     dc:title "Core Meta Ontology" ;
     dc:version "1.0" ;
     owl:versionInfo "1.0" ;
-    rdfs:comment "Core concepts shared across domain ontologies" . 
+    rdfs:comment "Core concepts shared across domain ontologies" .
+
+meta:hasLevel rdf:type owl:DatatypeProperty ;
+    rdfs:label "has level" ;
+    rdfs:comment "Specifies the level of an entity" ;
+    rdfs:domain meta:AbstractConcept ;
+    rdfs:range xsd:integer . 

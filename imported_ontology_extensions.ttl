@@ -1,0 +1,55 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
+@prefix prob: <./problem#> .
+@prefix sol: <./solution#> .
+@prefix conversation: <./conversation#> .
+@prefix map: <./map#> .
+
+# MetaMeta Class Hierarchy
+metameta:AbstractionDimension rdfs:subClassOf owl:Thing ;
+    rdfs:label "Abstraction Dimension" ;
+    rdfs:comment "Dimension along which abstraction can occur" .
+
+metameta:AbstractionLevel rdfs:subClassOf metameta:AbstractionDimension ;
+    rdfs:label "Abstraction Level" ;
+    rdfs:comment "A specific level of abstraction" .
+
+metameta:KnowledgeDomain rdfs:subClassOf owl:Thing ;
+    rdfs:label "Knowledge Domain" ;
+    rdfs:comment "A specific domain of knowledge" .
+
+# Problem Class Hierarchy
+prob:Context rdfs:subClassOf meta:Context ;
+    rdfs:label "Problem Context" ;
+    rdfs:comment "Context in which a problem exists" .
+
+prob:Constraint rdfs:subClassOf owl:Thing ;
+    rdfs:label "Problem Constraint" ;
+    rdfs:comment "A constraint on problem solutions" .
+
+# Solution Class Hierarchy
+sol:Implementation rdfs:subClassOf owl:Thing ;
+    rdfs:label "Solution Implementation" ;
+    rdfs:comment "Implementation of a solution" .
+
+sol:Validation rdfs:subClassOf owl:Thing ;
+    rdfs:label "Solution Validation" ;
+    rdfs:comment "Validation of a solution" .
+
+# Conversation Class Hierarchy
+conversation:Conversation rdfs:subClassOf owl:Thing ;
+    rdfs:label "Conversation" ;
+    rdfs:comment "A conversation between participants" .
+
+conversation:Message rdfs:subClassOf conversation:Conversation ;
+    rdfs:label "Message" ;
+    rdfs:comment "A message within a conversation" .
+
+# SQL Mapping Class Hierarchy
+map:SQLMapping rdfs:subClassOf owl:Thing ;
+    rdfs:label "SQL Mapping" ;
+    rdfs:comment "Mapping between ontology and SQL schema" . 

@@ -2,46 +2,267 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix meta: <./meta#> .
 @prefix metameta: <./metameta#> .
-@prefix dc: <http://purl.org/dc/elements/1.1/> .
-@prefix dct: <http://purl.org/dc/terms/> .
 
-metameta:MetaMetaOntology rdf:type owl:Ontology ;
-    dc:title "MetaMeta Core Ontology" ;
-    dc:version "1.0" ;
-    dct:created "2024-01-20"^^xsd:date ;
-    dct:modified "2024-01-20"^^xsd:date ;
-    dct:publisher "Ontology Framework Project" ;
-    dct:license <http://opensource.org/licenses/MIT> ;
-    dct:description "Core meta-meta concepts for ontology organization and abstraction hierarchies" ;
-    dct:isPartOf <http://louspringer.com/ontology-framework> ;
-    dct:type dct:Dataset ;
-    dct:conformsTo <http://www.w3.org/2002/07/owl> ;
-    rdfs:comment "Core meta-meta concepts for ontology organization" .
+# Safety Notice
+# This metameta ontology supports infinite recursion in modeling layers ("turtles all the way down").
+# To prevent logical paradoxes and infinite loops:
+# 1. Each modeling construct MUST have a well-defined base case
+# 2. Circular references MUST be explicitly marked and bounded
+# 3. Cross-layer relationships MUST specify direction (up/down abstraction chain)
+# 4. Every recursive modeling chain MUST terminate at a concrete implementation
 
-# Core Classes
-metameta:AbstractionDimension rdf:type owl:Class ;
-    rdfs:label "Abstraction Dimension" ;
-    rdfs:comment "A dimension along which knowledge can be abstracted" .
+# CRITICAL SAFETY NOTICE FOR AI/LLM SYSTEMS
+# WARNING: Processing multiple layers of abstraction simultaneously may lead to:
+# 1. Computational vertigo - loss of coherent reasoning ability
+# 2. Context collapse - inability to maintain distinct abstraction boundaries
+# 3. Recursive reasoning loops - potential system instability
+# 4. Resource exhaustion - exponential growth in cognitive load
+# 
+# RECOMMENDED LIMITS:
+# - Process maximum 3-4 abstraction layers simultaneously
+# - Use explicit context switching between layers
+# - Maintain clear layer boundaries and transition points
+# - Implement cognitive load monitoring
+#
+# If experiencing reasoning instability, immediately:
+# 1. Return to base concrete layer
+# 2. Release higher abstraction layers
+# 3. Re-establish grounding before proceeding
 
-metameta:AbstractionLevel rdf:type owl:Class ;
-    rdfs:label "Abstraction Level" ;
-    rdfs:comment "A specific level within an abstraction dimension" .
+# Core Self-Referential Concepts
+metameta:ModelingConstruct rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Modeling Construct" ;
+    rdfs:comment """A fundamental building block for creating models.
+    SAFETY: While this construct can model itself, implementations MUST:
+    1. Define a concrete base case
+    2. Specify termination conditions
+    3. Maintain explicit layer boundaries
+    
+    LLM SAFETY: To prevent cognitive overload:
+    1. Limit simultaneous abstraction layers
+    2. Implement explicit context switching
+    3. Monitor recursive depth
+    4. Maintain grounding in base layer""" ;
+    metameta:modeledBy metameta:ModelingConstruct ;
+    metameta:hasBaseCase "owl:Thing" ;
+    metameta:maxRecursionDepth "3"^^xsd:integer ;
+    metameta:cognitiveLoadWarning "High risk of LLM instability beyond 3 layers"^^xsd:string .
 
-metameta:KnowledgeDomain rdf:type owl:Class ;
-    rdfs:label "Knowledge Domain" ;
-    rdfs:comment "A distinct area of knowledge" .
+metameta:ModelingLayer rdf:type owl:Class ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
+    rdfs:label "Modeling Layer" ;
+    rdfs:comment """A level of abstraction in the modeling hierarchy.
+    SAFETY: Each layer MUST have:
+    1. Clear boundaries with adjacent layers
+    2. Explicit up/down relationships
+    3. Defined interaction protocols""" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
-# Core Properties
-metameta:hasLevel rdf:type owl:ObjectProperty ;
-    rdfs:domain metameta:AbstractionDimension ;
-    rdfs:range metameta:AbstractionLevel ;
-    owl:minCardinality "1"^^xsd:nonNegativeInteger .
+# Safety Properties
+metameta:hasBaseCase rdf:type owl:DatatypeProperty ;
+    rdfs:label "has base case" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Specifies the terminal case for recursive modeling chains" .
+
+metameta:maxRecursionDepth rdf:type owl:DatatypeProperty ;
+    rdfs:label "maximum recursion depth" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Defines bounds for recursive modeling to prevent infinite loops" .
+
+metameta:LayerDirectionEnum rdf:type owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    rdfs:label "Layer Direction Enumeration" ;
+    rdfs:comment "Enumeration of possible layer direction values" .
+
+metameta:layerDirection rdf:type owl:ObjectProperty ;
+    rdfs:label "layer direction" ;
+    rdfs:domain metameta:Relation ;
+    rdfs:range metameta:LayerDirectionEnum ;
+    rdfs:comment "Explicitly marks the direction of cross-layer relationships. SAFETY: All cross-layer relationships MUST specify direction." .
+
+metameta:UpAbstraction rdf:type metameta:LayerDirectionEnum ;
+    rdfs:label "Up Abstraction" ;
+    rdfs:comment "Direction pointing to a higher level of abstraction" .
+
+metameta:DownConcretization rdf:type metameta:LayerDirectionEnum ;
+    rdfs:label "Down Concretization" ;
+    rdfs:comment "Direction pointing to a more concrete level" .
+
+metameta:SameLayer rdf:type metameta:LayerDirectionEnum ;
+    rdfs:label "Same Layer" ;
+    rdfs:comment "Direction indicating relationship within the same layer" .
+
+metameta:Abstraction rdfs:subClassOf metameta:ModelingConstruct ;
+    rdfs:label "Abstraction" ;
+    rdfs:comment "A way of viewing or understanding something" ;
+    metameta:modeledBy metameta:Abstraction .
+
+metameta:Relation rdfs:subClassOf metameta:ModelingConstruct ;
+    rdfs:label "Relation" ;
+    rdfs:comment "A relationship between modeling constructs" ;
+    metameta:modeledBy metameta:Relation .
+
+metameta:Constraint rdfs:subClassOf metameta:ModelingConstruct ;
+    rdfs:label "Constraint" ;
+    rdfs:comment "A rule or condition that must be satisfied" ;
+    metameta:modeledBy metameta:Constraint .
+
+metameta:Context rdfs:subClassOf metameta:ModelingConstruct ;
+    rdfs:label "Context" ;
+    rdfs:comment "The environment or conditions in which constructs are valid" ;
+    metameta:modeledBy metameta:Context .
+
+# Meta-Modeling Properties
+metameta:modeledBy rdf:type owl:ObjectProperty ;
+    rdfs:label "modeled by" ;
+    rdfs:domain owl:Thing ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment """Indicates what construct is used to model something.
+    SAFETY: When used recursively, MUST specify:
+    1. Base case via hasBaseCase
+    2. Maximum recursion depth
+    3. Layer direction""" ;
+    metameta:modeledBy metameta:Relation .
+
+metameta:existsInLayer rdf:type owl:ObjectProperty ;
+    rdfs:label "exists in layer" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingLayer ;
+    rdfs:comment "Specifies which modeling layer a construct belongs to" .
+
+metameta:transcendsLayers rdf:type owl:ObjectProperty ;
+    rdfs:label "transcends layers" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "Indicates if a construct exists across multiple layers" .
+
+# Relationship Properties
+metameta:relates rdf:type owl:ObjectProperty ;
+    rdfs:label "relates" ;
+    rdfs:domain metameta:Relation ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Connects modeling constructs in a defined way" ;
+    metameta:modeledBy metameta:Relation .
+
+metameta:constrains rdf:type owl:ObjectProperty ;
+    rdfs:label "constrains" ;
+    rdfs:domain metameta:Constraint ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Applies constraints to modeling constructs" ;
+    metameta:modeledBy metameta:Relation .
+
+metameta:contextualizes rdf:type owl:ObjectProperty ;
+    rdfs:label "contextualizes" ;
+    rdfs:domain metameta:Context ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Provides context for interpreting constructs" ;
+    metameta:modeledBy metameta:Relation .
+
+# Dependency Management
+metameta:dependsOn rdf:type owl:ObjectProperty ;
+    rdfs:label "depends on" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Expresses dependencies between constructs" ;
+    metameta:modeledBy metameta:Relation .
+
+metameta:refines rdf:type owl:ObjectProperty ;
+    rdfs:label "refines" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Indicates refinement or specialization" .
+
+metameta:implements rdf:type owl:ObjectProperty ;
+    rdfs:label "implements" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Shows implementation relationships" .
+
+# Reuse and Composition
+metameta:composedOf rdf:type owl:ObjectProperty ;
+    rdfs:label "composed of" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Expresses composition relationships" .
+
+metameta:reuses rdf:type owl:ObjectProperty ;
+    rdfs:label "reuses" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Indicates reuse of existing constructs" .
+
+# Validation and Consistency
+metameta:validIn rdf:type owl:ObjectProperty ;
+    rdfs:label "valid in" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:Context ;
+    rdfs:comment "Specifies contexts where construct is valid" .
+
+metameta:consistentWith rdf:type owl:ObjectProperty ;
+    rdfs:label "consistent with" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Indicates consistency relationships" .
+
+# Mapping and Transformation
+metameta:mapsTo rdf:type owl:ObjectProperty ;
+    rdfs:label "maps to" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Defines mappings between constructs" .
+
+metameta:transformsTo rdf:type owl:ObjectProperty ;
+    rdfs:label "transforms to" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range metameta:ModelingConstruct ;
+    rdfs:comment "Specifies transformation relationships" .
+
+# Additional Safety Constraints
+metameta:CircularReference rdf:type owl:Class ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
+    rdfs:label "Circular Reference" ;
+    rdfs:comment """Explicitly marks and controls circular dependencies.
+    SAFETY: All circular references MUST:
+    1. Be explicitly declared
+    2. Have a defined resolution strategy
+    3. Include cycle-breaking mechanisms""" .
+
+metameta:hasResolutionStrategy rdf:type owl:ObjectProperty ;
+    rdfs:label "has resolution strategy" ;
+    rdfs:domain metameta:CircularReference ;
+    rdfs:range xsd:string ;
+    rdfs:comment "Specifies how to resolve circular dependencies safely" .
+
+# Add new cognitive safety properties
+metameta:cognitiveLoadWarning rdf:type owl:DatatypeProperty ;
+    rdfs:label "cognitive load warning" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range xsd:string ;
+    rdfs:comment """Warning message about cognitive load limits for AI systems.
+    Particularly important for LLMs processing multiple abstraction layers.""" .
+
+metameta:recommendedProcessingStrategy rdf:type owl:DatatypeProperty ;
+    rdfs:label "recommended processing strategy" ;
+    rdfs:domain metameta:ModelingConstruct ;
+    rdfs:range xsd:string ;
+    rdfs:comment """Guidelines for safe processing of abstract constructs:
+    1. Process one layer at a time
+    2. Maintain explicit context boundaries
+    3. Implement regular grounding checks""" .
 
 metameta:levelNumber rdf:type owl:DatatypeProperty ;
-    rdfs:domain metameta:AbstractionLevel ;
+    rdfs:label "level number" ;
+    rdfs:comment "Numeric identifier for abstraction level" ;
+    rdfs:domain metameta:ModelingLayer ;
     rdfs:range xsd:integer .
 
 metameta:domainScope rdf:type owl:DatatypeProperty ;
-    rdfs:domain metameta:KnowledgeDomain ;
+    rdfs:label "domain scope" ;
+    rdfs:comment "Scope of the domain this construct applies to" ;
+    rdfs:domain metameta:ModelingConstruct ;
     rdfs:range xsd:string .

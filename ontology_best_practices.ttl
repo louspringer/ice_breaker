@@ -1,0 +1,144 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
+@prefix problem: <./problem#> .
+@prefix solution: <./solution#> .
+@prefix conversation: <./conversation#> .
+@prefix best: <./ontology_best_practices#> .
+
+# Ontology Best Practices and Validation Rules
+best:OntologyBestPractices rdf:type owl:Ontology ;
+    rdfs:label "Ontology Best Practices" ;
+    rdfs:comment "Captures lessons learned and best practices for ontology development and validation" .
+
+# Core Classes
+best:ValidationRule rdf:type owl:Class ;
+    rdfs:label "Validation Rule" ;
+    rdfs:comment "A rule that must be checked during ontology validation" .
+
+best:Checklist rdf:type owl:Class ;
+    rdfs:label "Checklist" ;
+    rdfs:comment "A checklist of items to verify before committing ontology changes" .
+
+best:DevelopmentPhase rdf:type owl:Class ;
+    rdfs:label "Development Phase" ;
+    rdfs:comment "A phase in the ontology development lifecycle" .
+
+# Properties
+best:hasCheckItem rdf:type owl:ObjectProperty ;
+    rdfs:label "has check item" ;
+    rdfs:domain best:Checklist ;
+    rdfs:range best:CheckItem ;
+    rdfs:comment "Links a checklist to its items" .
+
+best:hasValidationRule rdf:type owl:ObjectProperty ;
+    rdfs:label "has validation rule" ;
+    rdfs:domain best:DevelopmentPhase ;
+    rdfs:range best:ValidationRule ;
+    rdfs:comment "Links a development phase to its validation rules" .
+
+best:priority rdf:type owl:DatatypeProperty ;
+    rdfs:label "priority" ;
+    rdfs:domain best:ValidationRule ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "Priority level of the validation rule" .
+
+# Development Phases
+best:Design rdf:type best:DevelopmentPhase ;
+    rdfs:label "Design Phase" ;
+    rdfs:comment "Initial design and planning of the ontology" .
+
+best:Implementation rdf:type best:DevelopmentPhase ;
+    rdfs:label "Implementation Phase" ;
+    rdfs:comment "Actual implementation of the ontology" .
+
+best:Validation rdf:type best:DevelopmentPhase ;
+    rdfs:label "Validation Phase" ;
+    rdfs:comment "Testing and validation of the ontology" .
+
+# Validation Rules
+best:PropertyLabelRule rdf:type best:ValidationRule ;
+    rdfs:label "Property Label Rule" ;
+    rdfs:comment "All properties must have rdfs:label" ;
+    best:priority 1 .
+
+best:PropertyTypeRule rdf:type best:ValidationRule ;
+    rdfs:label "Property Type Rule" ;
+    rdfs:comment "All properties must be explicitly typed as owl:ObjectProperty or owl:DatatypeProperty" ;
+    best:priority 1 .
+
+best:NamespaceConsistencyRule rdf:type best:ValidationRule ;
+    rdfs:label "Namespace Consistency Rule" ;
+    rdfs:comment "All namespaces must be consistently defined and used across files" ;
+    best:priority 1 .
+
+best:DomainRangeRule rdf:type best:ValidationRule ;
+    rdfs:label "Domain Range Rule" ;
+    rdfs:comment "All properties should have explicit domain and range definitions" ;
+    best:priority 2 .
+
+# Checklists
+best:PreCommitChecklist rdf:type best:Checklist ;
+    rdfs:label "Pre-commit Checklist" ;
+    rdfs:comment "Items to check before committing ontology changes" ;
+    best:hasCheckItem [
+        rdf:type best:CheckItem ;
+        rdfs:label "Namespace Check" ;
+        rdfs:comment "Verify all namespaces are properly defined and consistent"
+    ], [
+        rdf:type best:CheckItem ;
+        rdfs:label "Property Labels" ;
+        rdfs:comment "Ensure all properties have rdfs:label"
+    ], [
+        rdf:type best:CheckItem ;
+        rdfs:label "Property Types" ;
+        rdfs:comment "Verify all properties have explicit type declarations"
+    ], [
+        rdf:type best:CheckItem ;
+        rdfs:label "Domain Range" ;
+        rdfs:comment "Check domain and range definitions for all properties"
+    ], [
+        rdf:type best:CheckItem ;
+        rdfs:label "SQL Mappings" ;
+        rdfs:comment "Verify SQL mappings are complete and consistent"
+    ] .
+
+# Best Practices
+best:NamespaceManagementPractice rdf:type best:ValidationRule ;
+    rdfs:label "Namespace Management Practice" ;
+    rdfs:comment """
+    1. Use consistent namespace prefixes across all files
+    2. Always use relative paths for local ontologies
+    3. Document all namespace dependencies
+    4. Verify namespace declarations before validation
+    """ .
+
+best:PropertyDefinitionPractice rdf:type best:ValidationRule ;
+    rdfs:label "Property Definition Practice" ;
+    rdfs:comment """
+    1. Always declare explicit property types
+    2. Include rdfs:label for all properties
+    3. Define domain and range
+    4. Document property characteristics
+    5. Check for property hierarchy consistency
+    """ .
+
+best:ValidationPractice rdf:type best:ValidationRule ;
+    rdfs:label "Validation Practice" ;
+    rdfs:comment """
+    1. Run validation after each significant change
+    2. Check both OWL and SHACL constraints
+    3. Verify SQL mappings when applicable
+    4. Document validation results
+    5. Address validation errors immediately
+    """ .
+
+# TODO: Future Enhancements
+# 1. Add automated validation scripts
+# 2. Develop property consistency checkers
+# 3. Create namespace verification tools
+# 4. Implement SQL mapping validators
+# 5. Add visualization tools for ontology structure 

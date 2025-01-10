@@ -30,18 +30,26 @@ sol:Validation rdf:type owl:Class ;
 
 # Core Properties
 sol:satisfies rdf:type owl:ObjectProperty ;
+    rdfs:label "satisfies" ;
+    rdfs:comment "Indicates that a solution satisfies a requirement" ;
     rdfs:domain sol:TechnicalSolution ;
     rdfs:range prob:BusinessNeed .
 
 sol:hasImplementation rdf:type owl:ObjectProperty ;
+    rdfs:label "has implementation" ;
+    rdfs:comment "Links a solution to its implementation details" ;
     rdfs:domain sol:TechnicalSolution ;
     rdfs:range sol:Implementation .
 
 sol:hasValidation rdf:type owl:ObjectProperty ;
+    rdfs:label "has validation" ;
+    rdfs:comment "Links a solution to its validation criteria" ;
     rdfs:domain sol:Implementation ;
     rdfs:range sol:Validation .
 
 sol:validationStatus rdf:type owl:DatatypeProperty ;
+    rdfs:label "validation status" ;
+    rdfs:comment "The current validation status of a solution" ;
     rdfs:domain sol:Validation ;
     rdfs:range xsd:string .
 
