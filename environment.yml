@@ -1,10 +1,9 @@
 name: ice_breaker
 channels:
   - conda-forge
+  - anaconda
   - defaults
 dependencies:
-  - _libgcc_mutex
-  - _openmp_mutex
   - aiohttp
   - attrs
   - babel
@@ -19,10 +18,16 @@ dependencies:
   - requests
   - sqlalchemy
   - wheel
-  - pip:
-      - linkedin-api
-      - selenium
-      - sortedcontainers
-      - webdriver-manager
-      - chromedriver-binary
-prefix: /home/ubuntu/anaconda3/envs/ice_breaker
+  - linkedin-api
+  - selenium
+  - webdriver-manager
+  - chromedriver-binary
+  - beautifulsoup4
+  - snowflake-snowpark-python
+  - rdflib>=6.0.0
+  - pyshacl>=0.20.0
+  - owlready2
+  - graphviz
+  - openjdk=17
+  - plantuml
+  - rdflib

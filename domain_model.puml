@@ -1,0 +1,115 @@
+@startuml ice-breaker-domain-model
+
+' Style and theme
+skinparam backgroundColor white
+skinparam linetype ortho
+skinparam class {
+    BackgroundColor White
+    ArrowColor #2688d4
+    BorderColor #2688d4
+    FontColor black
+}
+skinparam note {
+    BackgroundColor White
+    BorderColor Gray
+    FontColor black
+}
+
+' Core Classes
+abstract class AbstractionDimension {
+    +label: string
+    +comment: string
+}
+
+class Person {
+    +label: string
+    +comment: string
+}
+
+class Contact {
+    +contactEmail: string
+    +linkedInURL: string
+}
+
+class NetworkingDegree {
+    +label: string
+    +priority: integer
+}
+
+class InteractionPoint {
+    +lastInteractionDate: dateTime
+}
+
+class ResearchInsight {
+    +content: string
+}
+
+class CommonGround {
+    +description: string
+}
+
+class BusinessNeed {
+    +value: string
+    +priority: integer [1..5]
+}
+
+class Context {
+    +description: string
+}
+
+class Constraint {
+    +description: string
+}
+
+class NetworkingStrategy {
+    +description: string
+}
+
+class ContactPlan {
+    +description: string
+}
+
+class Conversation {
+    +timestamp: dateTime
+    +participants: string
+}
+
+class Message {
+    +content: string
+}
+
+' Relationships
+Contact --|> Person
+Contact "1" *-- "1" NetworkingDegree : hasNetworkingDegree
+Contact "1" o-- "*" InteractionPoint : hasInteraction
+Contact "1" o-- "*" ResearchInsight : hasResearchInsight
+Contact "*" -- "*" CommonGround : sharesCommonGround
+BusinessNeed "*" -- "1" Context : hasContext
+BusinessNeed "*" -- "*" Constraint : hasConstraint
+NetworkingStrategy "*" -- "*" BusinessNeed : satisfies
+ContactPlan "1" -- "1" Contact : targetContact
+Conversation "1" *-- "*" Message : hasMessage
+
+' Inheritance from AbstractionDimension
+BusinessNeed --|> AbstractionDimension
+NetworkingStrategy --|> AbstractionDimension
+
+note right of Contact
+  All contacts must have:
+  - Valid email format
+  - LinkedIn URL starting with
+    https://www.linkedin.com/
+end note
+
+note right of NetworkingDegree
+  Predefined degrees:
+  - FirstDegree (priority: 1)
+  - SecondDegree (priority: 2)
+end note
+
+note right of InteractionPoint
+  Captures each touchpoint
+  with date and context
+end note
+
+@enduml 

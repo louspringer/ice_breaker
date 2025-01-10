@@ -1,0 +1,71 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sol: <./solution#> .
+@prefix prob: <./problem#> .
+@prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+sol:SolutionOntology rdf:type owl:Ontology ;
+    dc:title "Solution Ontology" ;
+    dc:version "1.1" ;
+    rdfs:comment "Updated to include solutions for interdisciplinary collaboration." ;
+    owl:imports <./meta> .
+
+# Core Classes
+sol:TechnicalSolution rdf:type owl:Class ;
+    rdfs:label "Technical Solution" ;
+    rdfs:comment "Proposed or implemented technical approach" ;
+    rdfs:subClassOf meta:AbstractionDimension .
+
+sol:Implementation rdf:type owl:Class ;
+    rdfs:label "Implementation" ;
+    rdfs:comment "Concrete implementation details" .
+
+sol:Validation rdf:type owl:Class ;
+    rdfs:label "Validation" ;
+    rdfs:comment "Validation criteria and results" .
+
+# Core Properties
+sol:satisfies rdf:type owl:ObjectProperty ;
+    rdfs:domain sol:TechnicalSolution ;
+    rdfs:range prob:BusinessNeed .
+
+sol:hasImplementation rdf:type owl:ObjectProperty ;
+    rdfs:domain sol:TechnicalSolution ;
+    rdfs:range sol:Implementation .
+
+sol:hasValidation rdf:type owl:ObjectProperty ;
+    rdfs:domain sol:Implementation ;
+    rdfs:range sol:Validation .
+
+sol:validationStatus rdf:type owl:DatatypeProperty ;
+    rdfs:domain sol:Validation ;
+    rdfs:range xsd:string .
+
+# New Solutions
+sol:InterdisciplinaryWorkshop rdf:type sol:TechnicalSolution ;
+    rdfs:label "Interdisciplinary Workshop" ;
+    rdfs:comment "Workshop designed to facilitate communication between biologists and programmers." .
+
+sol:SharedGlossarySolution rdf:type sol:TechnicalSolution ;
+    rdfs:label "Shared Glossary Solution" ;
+    rdfs:comment "Creating a shared glossary to bridge terminology gaps." .
+
+# Add cross-references to problem space
+sol:TechnicalSolution rdfs:subClassOf [
+    rdf:type owl:Restriction ;
+    owl:onProperty sol:satisfies ;
+    owl:someValuesFrom prob:BusinessNeed
+] .
+
+# Add validation status enumeration
+sol:ValidationStatus rdf:type owl:Class ;
+    owl:oneOf (
+        sol:Pending
+        sol:InProgress 
+        sol:Completed
+        sol:Failed
+    ) .

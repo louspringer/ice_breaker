@@ -1,0 +1,154 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix prob: <./problem#> .
+@prefix sol: <./solution#> .
+@prefix conversation: <./conversation#> .
+@prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
+@prefix icebreaker: <./icebreaker#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+icebreaker:IcebreakerOntology rdf:type owl:Ontology ;
+    dc:title "Icebreaker Ontology" ;
+    dc:version "1.1" ;
+    rdfs:comment "Ontology for managing cold contact networking and relationship building" ;
+    owl:imports <./problem> ;
+    owl:imports <./solution> ;
+    owl:imports <./meta> ;
+    owl:imports <./metameta> ;
+    owl:versionInfo "Updated with SHACL shapes and OWL restrictions" .
+
+# Core Classes with Enhanced Definitions
+icebreaker:Contact rdf:type owl:Class ;
+    rdfs:label "Contact" ;
+    rdfs:comment "A person who is a potential or existing networking contact" ;
+    rdfs:subClassOf meta:Person ;
+    rdfs:subClassOf [
+        rdf:type owl:Restriction ;
+        owl:onProperty icebreaker:hasNetworkingDegree ;
+        owl:cardinality 1
+    ] ;
+    rdfs:subClassOf [
+        rdf:type owl:Restriction ;
+        owl:onProperty icebreaker:contactEmail ;
+        owl:maxCardinality 1
+    ] .
+
+icebreaker:NetworkingDegree rdf:type owl:Class ;
+    rdfs:label "Networking Degree" ;
+    rdfs:comment "Classification of contact relationship (1st degree, 2nd degree, etc.)" ;
+    rdfs:subClassOf meta:Classification .
+
+icebreaker:InteractionPoint rdf:type owl:Class ;
+    rdfs:label "Interaction Point" ;
+    rdfs:comment "A specific interaction or touchpoint with a contact" ;
+    rdfs:subClassOf conversation:Interaction .
+
+icebreaker:ResearchInsight rdf:type owl:Class ;
+    rdfs:label "Research Insight" ;
+    rdfs:comment "Information gathered about a contact for conversation preparation" ;
+    rdfs:subClassOf prob:Information .
+
+icebreaker:CommonGround rdf:type owl:Class ;
+    rdfs:label "Common Ground" ;
+    rdfs:comment "Shared experiences, interests, or connections between contacts" ;
+    rdfs:subClassOf meta:SharedContext .
+
+# Enhanced Properties with Characteristics
+icebreaker:hasNetworkingDegree rdf:type owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range icebreaker:NetworkingDegree ;
+    rdfs:label "has networking degree" ;
+    rdfs:comment "Specifies the networking relationship degree with a contact" .
+
+icebreaker:hasInteraction rdf:type owl:ObjectProperty ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range icebreaker:InteractionPoint ;
+    rdfs:label "has interaction" ;
+    rdfs:comment "Links a contact to their interaction history" ;
+    owl:inverseOf icebreaker:interactionWith .
+
+icebreaker:interactionWith rdf:type owl:ObjectProperty ;
+    rdfs:domain icebreaker:InteractionPoint ;
+    rdfs:range icebreaker:Contact ;
+    rdfs:label "interaction with" ;
+    rdfs:comment "Links an interaction to the contact involved" .
+
+icebreaker:sharesCommonGround rdf:type owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain icebreaker:Contact ;
+    rdfs:range icebreaker:CommonGround ;
+    rdfs:label "shares common ground" ;
+    rdfs:comment "Links contacts through shared experiences or interests" .
+
+# SHACL Shapes for Validation
+icebreaker:ContactShape rdf:type sh:NodeShape ;
+    sh:targetClass icebreaker:Contact ;
+    sh:property [
+        sh:path icebreaker:contactEmail ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$" ;
+        sh:maxCount 1 ;
+        sh:message "Contact must have a valid email address"
+    ] ;
+    sh:property [
+        sh:path icebreaker:linkedInURL ;
+        sh:datatype xsd:string ;
+        sh:pattern "^https://www\\.linkedin\\.com/.*$" ;
+        sh:maxCount 1 ;
+        sh:message "Contact must have a valid LinkedIn URL"
+    ] .
+
+icebreaker:InteractionShape rdf:type sh:NodeShape ;
+    sh:targetClass icebreaker:InteractionPoint ;
+    sh:property [
+        sh:path icebreaker:lastInteractionDate ;
+        sh:datatype xsd:dateTime ;
+        sh:maxCount 1 ;
+        sh:message "Interaction must have a valid date"
+    ] .
+
+# Integration with Solution Patterns
+icebreaker:NetworkingStrategy rdf:type owl:Class ;
+    rdfs:label "Networking Strategy" ;
+    rdfs:comment "A strategy for building and maintaining professional relationships" ;
+    rdfs:subClassOf sol:Strategy .
+
+icebreaker:ContactPlan rdf:type owl:Class ;
+    rdfs:label "Contact Plan" ;
+    rdfs:comment "A planned approach for engaging with a specific contact" ;
+    rdfs:subClassOf sol:Plan ;
+    rdfs:subClassOf [
+        rdf:type owl:Restriction ;
+        owl:onProperty icebreaker:targetContact ;
+        owl:cardinality 1
+    ] .
+
+icebreaker:targetContact rdf:type owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain icebreaker:ContactPlan ;
+    rdfs:range icebreaker:Contact ;
+    rdfs:label "target contact" ;
+    rdfs:comment "The contact this plan is designed for" .
+
+# Enhanced Individuals with Better Integration
+icebreaker:FirstDegree rdf:type icebreaker:NetworkingDegree, owl:NamedIndividual ;
+    rdfs:label "First Degree Connection" ;
+    rdfs:comment "Direct connection in network" ;
+    meta:priority "1"^^xsd:integer .
+
+icebreaker:SecondDegree rdf:type icebreaker:NetworkingDegree, owl:NamedIndividual ;
+    rdfs:label "Second Degree Connection" ;
+    rdfs:comment "Connection through one intermediary" ;
+    meta:priority "2"^^xsd:integer .
+
+# TODO Section with Specific Tasks
+# 1. Add more SHACL shapes for validation of interaction quality
+# 2. Develop patterns for measuring networking effectiveness
+# 3. Add rules for automated contact prioritization
+# 4. Integrate with external professional network data sources
+# 5. Add privacy and consent management patterns
+# 6. Develop temporal aspects for follow-up scheduling
+# 7. Add sentiment analysis for interaction outcomes
+# 8. Expand common ground categories and classification 

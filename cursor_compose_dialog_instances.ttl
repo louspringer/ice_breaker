@@ -1,0 +1,68 @@
+# Instance data for Cursor IDE conversation ontology
+# 
+# This file contains instance data representing a conversation about Cursor IDE's compose functionality.
+# It references class and property definitions from conversation_ontology.ttl and demonstrates
+# the practical application of the ontology for modeling structured dialogue.
+#
+# The instances capture:
+# - A complete conversation about Cursor's compose features
+# - Individual messages with timestamps and senders
+# - The relationship between messages and the conversation
+# - Temporal sequence of the dialogue
+#
+# Created: 2024-03-20
+# Dependencies: conversation_ontology.ttl
+
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix conv: <http://example.com/conversation#> .
+@prefix inst: <http://example.com/conversation/instances#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# Conversation instance about Cursor's compose functionality
+inst:cursorComposeConversation
+    rdf:type conv:Conversation ;
+    dcterms:created "2024-03-20T10:00:00Z"^^xsd:dateTime ;
+    conv:participants "Human, Assistant" ;
+    conv:hasMessage inst:msg1, inst:msg2, inst:msg3, inst:msg4 .
+
+# Message instances
+inst:msg1
+    rdf:type conv:Message ;
+    conv:content """How do I use the cursor 'compose' facility?""" ;
+    conv:timestamp "2024-03-20T10:00:00Z"^^xsd:dateTime ;
+    conv:sender "Human" .
+
+inst:msg2
+    rdf:type conv:Message ;
+    conv:content """Let me explain how to use Cursor's compose feature:
+    1. Keyboard Shortcut: Press Cmd + K (Mac) or Ctrl + K (Windows/Linux)
+    2. Using Comments: Place cursor at end of comment
+    3. Selection-Based: Select code and press shortcut
+    The feature works best with clear context and specific requirements.""" ;
+    conv:timestamp "2024-03-20T10:00:05Z"^^xsd:dateTime ;
+    conv:sender "Assistant" .
+
+inst:msg3
+    rdf:type conv:Message ;
+    conv:content """How does this functionality differ from or complement the 'COMPOSER' tab in the cursor ide?""" ;
+    conv:timestamp "2024-03-20T10:01:00Z"^^xsd:dateTime ;
+    conv:sender "Human" .
+
+inst:msg4
+    rdf:type conv:Message ;
+    conv:content """The key differences are:
+    Quick Compose (Cmd/Ctrl + K):
+    - Inline generation
+    - Context-aware
+    - Better for quick iterations
+    
+    COMPOSER Tab:
+    - Dedicated space
+    - Multi-turn dialogue
+    - Project-wide context
+    
+    They complement each other for different use cases.""" ;
+    conv:timestamp "2024-03-20T10:01:05Z"^^xsd:dateTime ;
+    conv:sender "Assistant" . 
