@@ -1,33 +1,13 @@
 name: ice_breaker
 channels:
   - conda-forge
-  - anaconda
   - defaults
 dependencies:
-  - aiohttp
-  - attrs
-  - babel
-  - beautifulsoup4
-  - black
-  - cryptography
-  - flask
-  - jinja2
-  - langchain
-  - numpy
-  - pandas
-  - requests
-  - sqlalchemy
-  - wheel
-  - linkedin-api
-  - selenium
-  - webdriver-manager
-  - chromedriver-binary
-  - beautifulsoup4
-  - snowflake-snowpark-python
+  - python=3.9
+  - pip
   - rdflib>=6.0.0
-  - pyshacl>=0.20.0
-  - owlready2
-  - graphviz
-  - openjdk=17
-  - plantuml
-  - rdflib
+  - snowflake-snowpark-python>=1.5.0
+  - dataclasses>=0.8
+  - typing-extensions>=4.0.0
+  - sqlparse>=0.4.0
+  - pandas>=1.5.0

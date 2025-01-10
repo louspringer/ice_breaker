@@ -22,5 +22,6 @@
     "peacock.color": "#c34bf3",
     "python.analysis.extraPaths": [
         "/Users/lou/miniconda3/envs/ice_breaker/lib/python3.11/site-packages"
-    ]
+    ],
+    "dbt.dbtIntegration": "cloud"
 }
