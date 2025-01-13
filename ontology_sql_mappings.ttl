@@ -6,18 +6,21 @@
 @prefix metameta: <./metameta#> .
 @prefix problem: <./problem#> .
 @prefix solution: <./solution#> .
-@prefix conversation: <./conversation#> .
+@prefix conv: <./conversation#> .
 @prefix map: <./ontology_sql_mappings#> .
 @prefix icebreaker: <./icebreaker#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
 
 # Mapping Ontology
 map:SQLMappingOntology rdf:type owl:Ontology ;
-    rdfs:label "SQL Mapping Ontology" ;
+    dc:title "SQL Mapping Ontology" ;
+    dc:version "1.0" ;
+    owl:imports <./meta>, <./metameta> ;
     rdfs:comment "Defines mappings between ontology entities and SQL schema objects" .
 
-# Classes
+# Core Classes
 map:SQLMapping rdf:type owl:Class ;
-    rdfs:subClassOf meta:Mapping ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
     rdfs:label "SQL Mapping" ;
     rdfs:comment "Defines mappings between ontology elements and SQL database structures" .
 
@@ -29,484 +32,62 @@ map:ColumnMapping rdfs:subClassOf map:SQLMapping ;
     rdfs:label "Column Mapping" ;
     rdfs:comment "Maps an ontology property to a SQL column" .
 
-# Snowflake-specific Classes
-map:SnowflakeRole rdf:type owl:Class ;
-    rdfs:label "Snowflake Role" ;
-    rdfs:comment "Represents a Snowflake security role" .
-
-map:SnowflakeGrant rdf:type owl:Class ;
-    rdfs:label "Snowflake Grant" ;
-    rdfs:comment "Represents a privilege grant in Snowflake" .
-
-map:SnowflakeSchema rdf:type owl:Class ;
-    rdfs:label "Snowflake Schema" ;
-    rdfs:comment "Represents a Snowflake schema container" .
-
+# Snowflake Base Classes
 map:SnowflakeObject rdf:type owl:Class ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
     rdfs:label "Snowflake Object" ;
     rdfs:comment "Base class for Snowflake database objects" .
 
-map:SnowflakeConstraint rdf:type owl:Class ;
+map:SnowflakeSecurityObject rdfs:subClassOf map:SnowflakeObject ;
+    rdfs:label "Snowflake Security Object" ;
+    rdfs:comment "Base class for Snowflake security-related objects" .
+
+# Snowflake-specific Classes
+map:SnowflakeRole rdfs:subClassOf map:SnowflakeSecurityObject ;
+    rdfs:label "Snowflake Role" ;
+    rdfs:comment "Represents a Snowflake security role" .
+
+map:SnowflakeGrant rdfs:subClassOf map:SnowflakeSecurityObject ;
+    rdfs:label "Snowflake Grant" ;
+    rdfs:comment "Represents a privilege grant in Snowflake" .
+
+map:SnowflakeSchema rdfs:subClassOf map:SnowflakeObject ;
+    rdfs:label "Snowflake Schema" ;
+    rdfs:comment "Represents a Snowflake schema container" .
+
+map:SnowflakeConstraint rdfs:subClassOf map:SnowflakeObject ;
     rdfs:label "Snowflake Constraint" ;
     rdfs:comment "Represents a constraint in Snowflake" .
 
-# Add DryRun Validation Classes
-map:DryRunValidation rdf:type owl:Class ;
-    rdfs:label "Dry Run Validation" ;
-    rdfs:comment "Validates SQL transformations before execution" ;
-    rdfs:subClassOf map:ValidationRule .
-
-map:SQLSyntaxCheck rdf:type map:DryRunValidation ;
-    rdfs:label "SQL Syntax Check" ;
-    rdfs:comment "Validates SQL syntax without execution" ;
-    map:validationQuery """
-        SELECT PARSE_JSON('{
-            "sql": "{sql}",
-            "dialect": "snowflake"
-        }')::variant as parsed_sql
-    """ ;
-    map:validationPriority "1"^^xsd:integer .
-
-map:ObjectExistenceCheck rdf:type map:DryRunValidation ;
-    rdfs:label "Object Existence Check" ;
-    rdfs:comment "Validates referenced objects exist" ;
-    map:validationQuery """
-        SELECT OBJECT_NAME, OBJECT_TYPE 
-        FROM INFORMATION_SCHEMA.OBJECTS 
-        WHERE OBJECT_NAME = '{objectName}'
-        AND OBJECT_TYPE = '{objectType}'
-    """ ;
-    map:validationPriority "2"^^xsd:integer .
-
-map:PrivilegeCheck rdf:type map:DryRunValidation ;
-    rdfs:label "Privilege Check" ;
-    rdfs:comment "Validates role has required privileges" ;
-    map:validationQuery """
-        SHOW GRANTS TO ROLE {roleName}
-    """ ;
-    map:validationPriority "3"^^xsd:integer .
-
-map:DependencyCheck rdf:type map:DryRunValidation ;
-    rdfs:label "Dependency Check" ;
-    rdfs:comment "Validates object dependencies" ;
-    map:validationQuery """
-        SELECT REFERENCED_OBJECT_NAME, REFERENCED_OBJECT_TYPE
-        FROM INFORMATION_SCHEMA.OBJECT_DEPENDENCIES
-        WHERE OBJECT_NAME = '{objectName}'
-    """ ;
-    map:validationPriority "4"^^xsd:integer .
-
-# Add DryRun Properties
-map:validationQuery rdf:type owl:DatatypeProperty ;
-    rdfs:label "validation query" ;
-    rdfs:comment "SQL query to validate transformation" ;
-    rdfs:domain map:DryRunValidation ;
-    rdfs:range xsd:string .
-
-map:validationPriority rdf:type owl:DatatypeProperty ;
-    rdfs:label "validation priority" ;
-    rdfs:comment "Order in which validations should be run" ;
-    rdfs:domain map:DryRunValidation ;
-    rdfs:range xsd:integer .
-
-map:validationStatus rdf:type owl:DatatypeProperty ;
-    rdfs:label "validation status" ;
-    rdfs:comment "Result of validation check" ;
-    rdfs:domain map:DryRunValidation ;
-    rdfs:range xsd:string .
-
-# Add DryRun Process Rule
-map:DryRunProcess rdf:type map:TransformationRule ;
-    rdfs:label "Dry Run Process" ;
-    rdfs:comment "Process for validating SQL transformations" ;
-    map:executionOrder "0"^^xsd:integer ;
-    map:processSteps (
-        map:ValidateSyntax
-        map:ValidateObjects
-        map:ValidatePrivileges
-        map:ValidateDependencies
-        map:GenerateReport
-    ) .
-
-# Add Validation Steps
-map:ValidateSyntax rdf:type map:ValidationStep ;
-    rdfs:label "Validate Syntax" ;
-    map:stepOrder "1"^^xsd:integer ;
-    map:usesValidation map:SQLSyntaxCheck .
-
-map:ValidateObjects rdf:type map:ValidationStep ;
-    rdfs:label "Validate Objects" ;
-    map:stepOrder "2"^^xsd:integer ;
-    map:usesValidation map:ObjectExistenceCheck .
-
-map:ValidatePrivileges rdf:type map:ValidationStep ;
-    rdfs:label "Validate Privileges" ;
-    map:stepOrder "3"^^xsd:integer ;
-    map:usesValidation map:PrivilegeCheck .
-
-map:ValidateDependencies rdf:type map:ValidationStep ;
-    rdfs:label "Validate Dependencies" ;
-    map:stepOrder "4"^^xsd:integer ;
-    map:usesValidation map:DependencyCheck .
-
-map:GenerateReport rdf:type map:ValidationStep ;
-    rdfs:label "Generate Report" ;
-    map:stepOrder "5"^^xsd:integer ;
-    map:reportTemplate """
-        Dry Run Validation Report
-        ------------------------
-        SQL Syntax: {syntaxStatus}
-        Object Existence: {objectStatus}
-        Privileges: {privilegeStatus}
-        Dependencies: {dependencyStatus}
-        
-        Details:
-        {validationDetails}
-        
-        Recommendations:
-        {recommendations}
-    """ .
-
-# Add Report Properties
-map:reportTemplate rdf:type owl:DatatypeProperty ;
-    rdfs:label "report template" ;
-    rdfs:comment "Template for validation report" ;
-    rdfs:domain map:ValidationStep ;
-    rdfs:range xsd:string .
-
-map:stepOrder rdf:type owl:DatatypeProperty ;
-    rdfs:label "step order" ;
-    rdfs:comment "Order of validation step" ;
-    rdfs:domain map:ValidationStep ;
-    rdfs:range xsd:integer .
-
-map:usesValidation rdf:type owl:ObjectProperty ;
-    rdfs:label "uses validation" ;
-    rdfs:comment "Links validation step to validation rule" ;
-    rdfs:domain map:ValidationStep ;
-    rdfs:range map:DryRunValidation .
-
-# Add Validation Result Classes
+# Validation Classes
 map:ValidationResult rdf:type owl:Class ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
     rdfs:label "Validation Result" ;
-    rdfs:comment "Result of a validation check" .
+    rdfs:comment "Result of validating SQL mappings" .
 
-map:ValidationSuccess rdf:type map:ValidationResult ;
-    rdfs:label "Validation Success" ;
-    rdfs:comment "Validation passed successfully" .
-
-map:ValidationWarning rdf:type map:ValidationResult ;
-    rdfs:label "Validation Warning" ;
-    rdfs:comment "Validation passed with warnings" .
-
-map:ValidationError rdf:type map:ValidationResult ;
-    rdfs:label "Validation Error" ;
-    rdfs:comment "Validation failed" .
-
-# Add Result Properties
-map:resultMessage rdf:type owl:DatatypeProperty ;
-    rdfs:label "result message" ;
-    rdfs:comment "Detailed message about validation result" ;
-    rdfs:domain map:ValidationResult ;
-    rdfs:range xsd:string .
-
-map:resultTimestamp rdf:type owl:DatatypeProperty ;
-    rdfs:label "result timestamp" ;
-    rdfs:comment "When validation was performed" ;
-    rdfs:domain map:ValidationResult ;
-    rdfs:range xsd:dateTime .
-
-map:resultSeverity rdf:type owl:DatatypeProperty ;
-    rdfs:label "result severity" ;
-    rdfs:comment "Severity level of validation result" ;
-    rdfs:domain map:ValidationResult ;
-    rdfs:range xsd:string .
-
-# Role Hierarchy Rules
-map:ACCOUNTADMIN rdf:type map:SnowflakeRole ;
-    rdfs:label "Account Admin Role" ;
-    map:hasPrivilegeLevel "1"^^xsd:integer ;
-    map:canGrant (map:CREATE_ROLE map:GRANT_ROLE map:CREATE_DATABASE) .
-
-map:SYSADMIN rdf:type map:SnowflakeRole ;
-    rdfs:label "System Admin Role" ;
-    map:hasPrivilegeLevel "2"^^xsd:integer ;
-    map:canGrant (map:CREATE_SCHEMA map:CREATE_TABLE map:CREATE_VIEW) .
-
-map:ICE_BREAKER_ROLE rdf:type map:SnowflakeRole ;
-    rdfs:label "Ice Breaker Application Role" ;
-    map:hasPrivilegeLevel "3"^^xsd:integer ;
-    map:requiredGrants (map:USAGE map:SELECT map:INSERT map:UPDATE) .
-
-# Transformation Rules
-map:RoleTransformationRule rdf:type map:TransformationRule ;
-    rdfs:label "Role Creation and Grant Rule" ;
-    map:sqlTemplate """
-        USE ROLE ACCOUNTADMIN;
-        CREATE ROLE IF NOT EXISTS {roleName};
-        GRANT ROLE {roleName} TO ROLE SYSADMIN;
-        USE ROLE SYSADMIN;
-    """ ;
-    map:executionOrder "1"^^xsd:integer .
-
-map:SchemaTransformationRule rdf:type map:TransformationRule ;
-    rdfs:label "Schema Creation Rule" ;
-    map:sqlTemplate """
-        CREATE SCHEMA IF NOT EXISTS {schemaName};
-        GRANT USAGE ON SCHEMA {schemaName} TO ROLE {roleName};
-        GRANT CREATE TABLE, CREATE VIEW ON SCHEMA {schemaName} TO ROLE {roleName};
-    """ ;
-    map:executionOrder "2"^^xsd:integer .
-
-map:TableTransformationRule rdf:type map:TransformationRule ;
-    rdfs:label "Table Creation Rule" ;
-    map:sqlTemplate """
-        CREATE OR REPLACE TABLE {tableName} (
-            {columns},
-            created_at TIMESTAMP_TZ DEFAULT CURRENT_TIMESTAMP(),
-            updated_at TIMESTAMP_TZ DEFAULT CURRENT_TIMESTAMP()
-        );
-    """ ;
-    map:executionOrder "3"^^xsd:integer .
-
-map:GrantTransformationRule rdf:type map:TransformationRule ;
-    rdfs:label "Grant Creation Rule" ;
-    map:sqlTemplate """
-        GRANT {privileges} ON {objectType} {objectName} TO ROLE {roleName};
-        GRANT {privileges} ON FUTURE {objectType}S IN SCHEMA {schemaName} TO ROLE {roleName};
-    """ ;
-    map:executionOrder "4"^^xsd:integer .
-
-# Validation Rules
-map:EmailValidationRule rdf:type map:ValidationRule ;
-    rdfs:label "Email Format Validation" ;
-    map:regexPattern "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$" ;
-    map:sqlConstraint "REGEXP_LIKE(contact_email, '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$')" .
-
-map:LinkedInURLValidationRule rdf:type map:ValidationRule ;
-    rdfs:label "LinkedIn URL Validation" ;
-    map:regexPattern "^https://www\\.linkedin\\.com/.*$" ;
-    map:sqlConstraint "REGEXP_LIKE(linkedin_url, '^https://www\\.linkedin\\.com/.*$')" .
-
-map:NetworkingDegreeValidationRule rdf:type map:ValidationRule ;
-    rdfs:label "Networking Degree Validation" ;
-    map:validValues ("FirstDegree" "SecondDegree") ;
-    map:sqlConstraint "networking_degree IN ('FirstDegree', 'SecondDegree')" .
-
-# Idempotency Rules
 map:IdempotencyRule rdf:type owl:Class ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
     rdfs:label "Idempotency Rule" ;
-    rdfs:comment "Rules for ensuring idempotent operations" .
-
-map:ObjectCreationOrder rdf:type map:IdempotencyRule ;
-    rdfs:label "Object Creation Order" ;
-    map:orderSequence (
-        "Drop Views"
-        "Drop Streams"
-        "Drop Child Tables"
-        "Drop Parent Tables"
-        "Create Parent Tables"
-        "Create Child Tables"
-        "Create Streams"
-        "Create Views"
-    ) .
-
-map:RequiredGrants rdf:type map:IdempotencyRule ;
-    rdfs:label "Required Grants Rule" ;
-    map:grantSequence (
-        "Database Usage"
-        "Schema Usage"
-        "Object Privileges"
-        "Future Grants"
-    ) .
+    rdfs:comment "Rule ensuring idempotent SQL operations" .
 
 # Properties
 map:hasTableName rdf:type owl:DatatypeProperty ;
     rdfs:label "has table name" ;
-    rdfs:comment "Specifies the SQL table name for an ontology element" ;
     rdfs:domain map:SQLMapping ;
-    rdfs:range xsd:string .
+    rdfs:range xsd:string ;
+    rdfs:comment "Specifies the SQL table name for an ontology element" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 map:hasColumnName rdf:type owl:DatatypeProperty ;
     rdfs:label "has column name" ;
-    rdfs:comment "Specifies the SQL column name for an ontology property" ;
     rdfs:domain map:SQLMapping ;
-    rdfs:range xsd:string .
+    rdfs:range xsd:string ;
+    rdfs:comment "Specifies the SQL column name for an ontology property" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 map:hasDataType rdf:type owl:DatatypeProperty ;
     rdfs:label "has SQL data type" ;
-    rdfs:comment "Specifies the SQL data type for a property" ;
     rdfs:domain map:SQLMapping ;
-    rdfs:range xsd:string .
-
-map:hasPrivilegeLevel rdf:type owl:DatatypeProperty ;
-    rdfs:label "has privilege level" ;
-    rdfs:domain map:SnowflakeRole ;
-    rdfs:range xsd:integer .
-
-map:sqlTemplate rdf:type owl:DatatypeProperty ;
-    rdfs:label "SQL template" ;
-    rdfs:domain map:TransformationRule ;
-    rdfs:range xsd:string .
-
-map:executionOrder rdf:type owl:DatatypeProperty ;
-    rdfs:label "execution order" ;
-    rdfs:domain map:TransformationRule ;
-    rdfs:range xsd:integer .
-
-# Object Properties
-map:canGrant rdf:type owl:ObjectProperty ;
-    rdfs:label "can grant" ;
-    rdfs:domain map:SnowflakeRole ;
-    rdfs:range rdf:List .
-
-map:requiredGrants rdf:type owl:ObjectProperty ;
-    rdfs:label "required grants" ;
-    rdfs:domain map:SnowflakeRole ;
-    rdfs:range rdf:List .
-
-map:orderSequence rdf:type owl:ObjectProperty ;
-    rdfs:label "order sequence" ;
-    rdfs:domain map:IdempotencyRule ;
-    rdfs:range rdf:List .
-
-map:grantSequence rdf:type owl:ObjectProperty ;
-    rdfs:label "grant sequence" ;
-    rdfs:domain map:IdempotencyRule ;
-    rdfs:range rdf:List .
-
-# TODO: Add validation rules for:
-# 1. Role hierarchy enforcement
-# 2. Schema naming conventions
-# 3. Object dependencies
-# 4. Grant inheritance
-# 5. Custom constraint definitions
-# 6. Cost estimation for operations
-# 7. Impact analysis of changes
-# 8. Rollback plan generation
-
-# Mappings for Contact/Person
-map:ContactMapping rdf:type map:TableMapping ;
-    rdfs:label "Contact Table Mapping" ;
-    map:hasTableName "NETWORKING.CONTACTS" ;
-    map:mapsClass icebreaker:Contact ;
-    map:denormalizedFrom meta:Person ;
-    map:hasColumns (
-        map:ContactIdColumn
-        map:FullNameColumn
-        map:TitleColumn
-        map:LocationColumn
-        map:ContactEmailColumn
-        map:LinkedInUrlColumn
-        map:MutualConnectionsColumn
-        map:NetworkingDegreeColumn
-    ) .
-
-map:ContactIdColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "contact_id" ;
-    map:hasDataType "NUMBER" ;
-    map:isPrimaryKey true .
-
-map:FullNameColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "full_name" ;
-    map:hasDataType "VARCHAR(255)" ;
-    map:mapsProperty icebreaker:fullName .
-
-map:TitleColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "title" ;
-    map:hasDataType "VARCHAR(500)" .
-
-map:LocationColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "location" ;
-    map:hasDataType "VARCHAR(255)" .
-
-map:ContactEmailColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "contact_email" ;
-    map:hasDataType "VARCHAR(255)" ;
-    map:mapsProperty icebreaker:contactEmail .
-
-map:LinkedInUrlColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "linkedin_url" ;
-    map:hasDataType "VARCHAR(500)" ;
-    map:mapsProperty icebreaker:linkedInURL .
-
-map:MutualConnectionsColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "mutual_connections" ;
-    map:hasDataType "VARCHAR(1000)" .
-
-map:NetworkingDegreeColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "networking_degree" ;
-    map:hasDataType "VARCHAR(50)" ;
-    map:mapsProperty icebreaker:hasNetworkingDegree .
-
-# Temporal Tracking Mappings
-map:ContactsStreamMapping rdf:type map:TableMapping ;
-    rdfs:label "Contacts Stream Mapping" ;
-    map:hasTableName "NETWORKING.CONTACTS_STREAM" ;
-    map:mapsClass icebreaker:TemporalTracking ;
-    map:hasColumns (
-        map:StreamMetadataColumn
-        map:ChangeTypeColumn
-        map:ChangeTimestampColumn
-    ) .
-
-map:StreamMetadataColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "METADATA$ACTION" ;
-    map:hasDataType "VARCHAR" ;
-    map:mapsProperty icebreaker:changeType .
-
-map:ChangeTimestampColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "METADATA$ROW_ID" ;
-    map:hasDataType "NUMBER" ;
-    map:mapsProperty icebreaker:changeTimestamp .
-
-# Data Quality Mappings
-map:ContactQualityMapping rdf:type map:TableMapping ;
-    rdfs:label "Contact Quality Mapping" ;
-    map:hasTableName "NETWORKING.CONTACT_QUALITY" ;
-    map:mapsClass icebreaker:DataQuality ;
-    map:hasColumns (
-        map:ContactIdColumn
-        map:ConfidenceScoreColumn
-        map:LastVerifiedColumn
-        map:DataSourceColumn
-    ) .
-
-map:ConfidenceScoreColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "confidence_score" ;
-    map:hasDataType "DECIMAL(5,2)" ;
-    map:mapsProperty icebreaker:confidenceScore .
-
-map:LastVerifiedColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "last_verified_date" ;
-    map:hasDataType "TIMESTAMP_TZ" ;
-    map:mapsProperty icebreaker:lastVerifiedDate .
-
-# Integration Metadata Mappings
-map:IntegrationMapping rdf:type map:TableMapping ;
-    rdfs:label "Integration Metadata Mapping" ;
-    map:hasTableName "NETWORKING.INTEGRATION_STATUS" ;
-    map:mapsClass icebreaker:IntegrationMetadata ;
-    map:hasColumns (
-        map:ContactIdColumn
-        map:ExternalSourceColumn
-        map:SyncStatusColumn
-        map:LastSyncColumn
-    ) .
-
-map:ExternalSourceColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "external_source" ;
-    map:hasDataType "VARCHAR(100)" ;
-    map:mapsProperty icebreaker:externalSource .
-
-map:SyncStatusColumn rdf:type map:ColumnMapping ;
-    map:hasColumnName "sync_status" ;
-    map:hasDataType "VARCHAR(50)" ;
-    map:mapsProperty icebreaker:syncStatus .
-
-# TODO: Add mappings for future tables
-# - InteractionPoint
-# - ResearchInsight
-# - CommonGround
-# - BusinessNeed
-# - NetworkingStrategy 
+    rdfs:range xsd:string ;
+    rdfs:comment "Specifies the SQL data type for a property" ;
+    metameta:modeledBy metameta:ModelingConstruct . 

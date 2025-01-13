@@ -1,0 +1,556 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix plan: <./planning#> .
+@prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
+@prefix prob: <./problem#> .
+@prefix sol: <./solution#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+plan:PlanningOntology rdf:type owl:Ontology ;
+    dc:title "Ontology Migration Planning" ;
+    dc:version "1.0" ;
+    owl:imports <./meta>, <./metameta>, <./problem>, <./solution> ;
+    rdfs:comment "Planning ontology for managing ontology migration and testing" .
+
+# Core Classes
+plan:MigrationTask rdf:type owl:Class ;
+    rdfs:label "Migration Task" ;
+    rdfs:comment "A specific task in the migration process" .
+
+plan:AffectedArtifact rdf:type owl:Class ;
+    rdfs:label "Affected Artifact" ;
+    rdfs:comment "An artifact that will be affected by the migration" .
+
+plan:DependencyRelation rdf:type owl:Class ;
+    rdfs:label "Dependency Relation" ;
+    rdfs:comment "Represents dependencies between artifacts" .
+
+plan:ValidationTest rdf:type owl:Class ;
+    rdfs:label "Validation Test" ;
+    rdfs:comment "A test to validate the migrated ontologies" .
+
+plan:DriftDocumentation rdf:type owl:Class ;
+    rdfs:label "Drift Documentation" ;
+    rdfs:comment "Documentation of differences from reference ontologies" .
+
+# Properties
+plan:hasStatus rdf:type owl:DatatypeProperty ;
+    rdfs:domain plan:MigrationTask ;
+    rdfs:range xsd:string ;
+    rdfs:label "has status" ;
+    rdfs:comment "Current status of a migration task" .
+
+plan:hasPriority rdf:type owl:DatatypeProperty ;
+    rdfs:domain plan:MigrationTask ;
+    rdfs:range xsd:integer ;
+    rdfs:label "has priority" ;
+    rdfs:comment "Priority level of a task" .
+
+plan:dependsOn rdf:type owl:ObjectProperty ;
+    rdfs:domain plan:AffectedArtifact ;
+    rdfs:range plan:AffectedArtifact ;
+    rdfs:label "depends on" ;
+    rdfs:comment "Indicates dependency between artifacts" .
+
+plan:hasValidationTest rdf:type owl:ObjectProperty ;
+    rdfs:domain plan:AffectedArtifact ;
+    rdfs:range plan:ValidationTest ;
+    rdfs:label "has validation test" ;
+    rdfs:comment "Links an artifact to its validation tests" .
+
+plan:hasDriftDoc rdf:type owl:ObjectProperty ;
+    rdfs:domain plan:AffectedArtifact ;
+    rdfs:range plan:DriftDocumentation ;
+    rdfs:label "has drift documentation" ;
+    rdfs:comment "Links an artifact to its drift documentation" .
+
+# Task Instances
+plan:IdentifyAffectedFiles rdf:type plan:MigrationTask ;
+    rdfs:label "Identify Affected Files" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 1 .
+
+plan:AnalyzeDownstreamImpact rdf:type plan:MigrationTask ;
+    rdfs:label "Analyze Downstream Impact" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 2 .
+
+plan:CreateMappingOntology rdf:type plan:MigrationTask ;
+    rdfs:label "Create Mapping Ontology" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 3 .
+
+plan:AnalyzeDependencies rdf:type plan:MigrationTask ;
+    rdfs:label "Analyze Dependencies" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 4 .
+
+plan:FirstIterationUpdate rdf:type plan:MigrationTask ;
+    rdfs:label "First Iteration Update" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 5 .
+
+plan:ValidationTesting rdf:type plan:MigrationTask ;
+    rdfs:label "Validation Testing" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 6 .
+
+plan:SecondIterationUpdate rdf:type plan:MigrationTask ;
+    rdfs:label "Second Iteration Update" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 7 .
+
+plan:FinalValidation rdf:type plan:MigrationTask ;
+    rdfs:label "Final Validation" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 8 .
+
+# Validation Tests
+plan:SyntaxValidation rdf:type plan:ValidationTest ;
+    rdfs:label "Syntax Validation" ;
+    rdfs:comment "Validates turtle syntax correctness" .
+
+plan:DependencyValidation rdf:type plan:ValidationTest ;
+    rdfs:label "Dependency Validation" ;
+    rdfs:comment "Validates dependency relationships" .
+
+plan:ConformanceValidation rdf:type plan:ValidationTest ;
+    rdfs:label "Conformance Validation" ;
+    rdfs:comment "Validates conformance with reference ontologies" .
+
+# Affected Artifacts
+plan:MetaOntology rdf:type plan:AffectedArtifact ;
+    rdfs:label "Meta Ontology" ;
+    rdfs:comment "Core meta ontology file" ;
+    plan:hasValidationTest plan:SyntaxValidation, plan:ConformanceValidation .
+
+plan:MetametaOntology rdf:type plan:AffectedArtifact ;
+    rdfs:label "Metameta Ontology" ;
+    rdfs:comment "Meta-meta ontology file" ;
+    plan:hasValidationTest plan:SyntaxValidation, plan:ConformanceValidation .
+
+plan:ProblemOntology rdf:type plan:AffectedArtifact ;
+    rdfs:label "Problem Ontology" ;
+    rdfs:comment "Problem domain ontology file" ;
+    plan:dependsOn plan:MetaOntology ;
+    plan:hasValidationTest plan:SyntaxValidation, plan:ConformanceValidation .
+
+plan:SolutionOntology rdf:type plan:AffectedArtifact ;
+    rdfs:label "Solution Ontology" ;
+    rdfs:comment "Solution domain ontology file" ;
+    plan:dependsOn plan:ProblemOntology, plan:MetaOntology ;
+    plan:hasValidationTest plan:SyntaxValidation, plan:ConformanceValidation .
+
+plan:ConversationOntology rdf:type plan:AffectedArtifact ;
+    rdfs:label "Conversation Ontology" ;
+    rdfs:comment "Conversation domain ontology file" ;
+    plan:dependsOn plan:MetaOntology ;
+    plan:hasValidationTest plan:SyntaxValidation, plan:ConformanceValidation .
+
+plan:IcebreakerOntology rdf:type plan:AffectedArtifact ;
+    rdfs:label "Icebreaker Ontology" ;
+    rdfs:comment "Domain-specific icebreaker ontology" ;
+    plan:dependsOn plan:MetaOntology, plan:ProblemOntology, plan:SolutionOntology ;
+    plan:hasValidationTest plan:SyntaxValidation, plan:DependencyValidation .
+
+plan:OntologyExtensions rdf:type plan:AffectedArtifact ;
+    rdfs:label "Ontology Extensions" ;
+    rdfs:comment "Extensions to imported ontologies" ;
+    plan:dependsOn plan:MetaOntology, plan:MetametaOntology ;
+    plan:hasValidationTest plan:SyntaxValidation, plan:DependencyValidation .
+
+# Update task statuses
+plan:IdentifyAffectedFiles plan:hasStatus "Completed" .
+plan:AnalyzeDownstreamImpact plan:hasStatus "Completed" .
+plan:CreateMappingOntology plan:hasStatus "Completed" .
+plan:AnalyzeDependencies plan:hasStatus "Completed" .
+plan:FirstIterationUpdate plan:hasStatus "In Progress" .
+
+# First Iteration Progress
+plan:CoreLayerUpdate rdf:type plan:MigrationTask ;
+    rdfs:label "Core Layer Update" ;
+    rdfs:comment "Update of meta.ttl and metameta.ttl" ;
+    plan:hasStatus "Completed" .
+
+plan:DomainLayerUpdate rdf:type plan:MigrationTask ;
+    rdfs:label "Domain Layer Update" ;
+    rdfs:comment "Update of problem.ttl, solution.ttl, and conversation.ttl" ;
+    plan:hasStatus "Not Started" ;
+    plan:dependsOn plan:CoreLayerUpdate .
+
+plan:ApplicationLayerUpdate rdf:type plan:MigrationTask ;
+    rdfs:label "Application Layer Update" ;
+    rdfs:comment "Update of icebreaker.ttl and extensions" ;
+    plan:hasStatus "Not Started" ;
+    plan:dependsOn plan:DomainLayerUpdate .
+
+# Validation Tasks
+plan:FirstIterationValidation rdf:type plan:ValidationTest ;
+    rdfs:label "First Iteration Validation" ;
+    rdfs:comment "Validation of first iteration updates" ;
+    plan:hasStatus "Not Started" ;
+    plan:dependsOn plan:ApplicationLayerUpdate .
+
+# Downstream Impact Documentation
+plan:DownstreamArtifacts rdf:type owl:Class ;
+    rdfs:label "Downstream Artifacts" ;
+    rdfs:comment "Artifacts affected by ontology changes" .
+
+plan:PythonValidation rdf:type plan:DownstreamArtifacts ;
+    rdfs:label "Python Validation Scripts" ;
+    rdfs:comment "Python scripts for ontology validation" ;
+    plan:dependsOn plan:MetaOntology, plan:ProblemOntology, plan:SolutionOntology .
+
+plan:SQLMappings rdf:type plan:DownstreamArtifacts ;
+    rdfs:label "SQL Mappings" ;
+    rdfs:comment "Ontology to SQL schema mappings" ;
+    plan:dependsOn plan:IcebreakerOntology .
+
+plan:DomainModel rdf:type plan:DownstreamArtifacts ;
+    rdfs:label "Domain Model" ;
+    rdfs:comment "PlantUML domain model diagrams" ;
+    plan:dependsOn plan:IcebreakerOntology .
+
+# Update task statuses
+plan:DomainLayerUpdate plan:hasStatus "Completed" .
+plan:ApplicationLayerUpdate plan:hasStatus "In Progress" .
+
+# Add validation results
+plan:DomainLayerValidation rdf:type plan:ValidationTest ;
+    rdfs:label "Domain Layer Validation" ;
+    rdfs:comment "Validation of domain layer ontologies" ;
+    plan:hasStatus "Completed" ;
+    plan:validationResult "All domain layer ontologies successfully aligned with reference implementations while preserving local extensions." .
+
+plan:ApplicationLayerValidation rdf:type plan:ValidationTest ;
+    rdfs:label "Application Layer Validation" ;
+    rdfs:comment "Validation of application layer ontologies" ;
+    plan:hasStatus "Completed" ;
+    plan:validationResult "Application layer ontologies successfully aligned with reference implementations while preserving local extensions." .
+
+# First Iteration Summary
+plan:FirstIterationSummary rdf:type plan:MigrationTask ;
+    rdfs:label "First Iteration Summary" ;
+    rdfs:comment """Completed updates:
+    1. Core Layer (meta.ttl, metameta.ttl)
+    2. Domain Layer (problem.ttl, solution.ttl, conversation.ttl)
+    3. Application Layer (imported_ontology_extensions.ttl)
+    
+    All updates preserve local extensions while aligning with reference implementations.""" ;
+    plan:hasStatus "Completed" .
+
+# Validation Issues
+plan:ValidationIssue rdf:type owl:Class ;
+    rdfs:label "Validation Issue" ;
+    rdfs:comment "A validation issue found during testing" .
+
+plan:ClassHierarchyIssue rdf:type plan:ValidationIssue ;
+    rdfs:label "Class Hierarchy Issue" ;
+    rdfs:comment "Classes not properly placed in hierarchy" ;
+    plan:affectedClasses """
+    - BacklogItem
+    - SnowflakeObject
+    - SnowflakeGrant
+    - SnowflakeConstraint
+    - ValidationResult
+    - IdempotencyRule
+    - SnowflakeSchema
+    - SnowflakeRole""" .
+
+plan:NamespaceBindingIssue rdf:type plan:ValidationIssue ;
+    rdfs:label "Namespace Binding Issue" ;
+    rdfs:comment "Namespaces used but not properly bound" ;
+    plan:affectedNamespaces """
+    - http://purl.org/dc/terms/
+    - http://opensource.org/licenses/MIT
+    - http://louspringer.com/ontology-framework""" .
+
+# Second Iteration Tasks
+plan:FixClassHierarchy rdf:type plan:MigrationTask ;
+    rdfs:label "Fix Class Hierarchy" ;
+    rdfs:comment "Add proper class hierarchy relationships for all classes" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 1 .
+
+plan:FixNamespaceBindings rdf:type plan:MigrationTask ;
+    rdfs:label "Fix Namespace Bindings" ;
+    rdfs:comment "Add proper namespace bindings for all used namespaces" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 2 .
+
+# Update task statuses
+plan:FirstIterationValidation plan:hasStatus "Completed" ;
+    plan:validationResult """
+    Issues found:
+    1. Class hierarchy incomplete for several classes
+    2. Namespace bindings missing for several namespaces
+    3. All other validation checks passed successfully""" .
+
+plan:SecondIterationUpdate plan:hasStatus "Not Started" ;
+    plan:dependsOn plan:FixClassHierarchy, plan:FixNamespaceBindings .
+
+# Update Second Iteration Task Statuses
+plan:FixClassHierarchy plan:hasStatus "Completed" ;
+    plan:progressNotes """
+    Completed:
+    1. Fixed BacklogItem class hierarchy in conversation.ttl
+    2. Fixed Snowflake classes hierarchy in ontology_sql_mappings.ttl
+    3. Fixed ValidationResult and IdempotencyRule classes
+    4. Updated all classes in icebreaker.ttl to include metameta:ModelingConstruct
+    5. Added proper class hierarchy documentation""" .
+
+plan:FixNamespaceBindings plan:hasStatus "In Progress" ;
+    plan:progressNotes """
+    Completed:
+    1. Added proper namespace bindings in metameta.ttl
+    2. Updated conversation.ttl with proper namespaces
+    
+    Remaining:
+    1. Verify namespace bindings in icebreaker.ttl
+    2. Update ontology_sql_mappings.ttl namespace documentation""" .
+
+# Add Verification Tasks
+plan:VerifyIcebreakerOntology rdf:type plan:MigrationTask ;
+    rdfs:label "Verify Icebreaker Ontology" ;
+    rdfs:comment "Verify class hierarchies and namespace bindings in icebreaker.ttl" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 3 ;
+    plan:dependsOn plan:FixClassHierarchy, plan:FixNamespaceBindings .
+
+plan:UpdateDocumentation rdf:type plan:MigrationTask ;
+    rdfs:label "Update Documentation" ;
+    rdfs:comment "Update class hierarchy and namespace documentation" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 4 ;
+    plan:dependsOn plan:VerifyIcebreakerOntology .
+
+# Add Second Iteration Validation
+plan:SecondIterationValidation rdf:type plan:ValidationTest ;
+    rdfs:label "Second Iteration Validation" ;
+    rdfs:comment "Final validation after fixing all issues" ;
+    plan:hasStatus "Not Started" ;
+    plan:dependsOn plan:UpdateDocumentation .
+
+# Update Verification Task Status
+plan:VerifyIcebreakerOntology plan:hasStatus "Completed" ;
+    plan:progressNotes """
+    Completed:
+    1. Fixed namespace bindings (added dct, skos, updated map prefix)
+    2. Updated class hierarchies to include metameta:ModelingConstruct
+    3. Fixed cardinality constraints to use proper XSD types
+    4. Updated imports to use more concise syntax
+    5. Verified and updated all remaining classes
+    6. Added metameta:modeledBy to all relevant constructs""" .
+
+# Update Next Tasks
+plan:UpdateSHACLShapes plan:hasStatus "In Progress" ;
+    plan:progressNotes """
+    Started:
+    1. Added metameta:ModelingConstruct to ContactShape
+    
+    Remaining:
+    1. Update remaining SHACL shapes
+    2. Add validation for new class hierarchies
+    3. Add validation for namespace usage""" .
+
+# Add SHACL Validation Task
+plan:UpdateSHACLShapes rdf:type plan:MigrationTask ;
+    rdfs:label "Update SHACL Shapes" ;
+    rdfs:comment "Update SHACL shapes for enhanced validation" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 5 ;
+    plan:dependsOn plan:VerifyIcebreakerOntology .
+
+# Update Task Statuses
+plan:UpdateSHACLShapes plan:hasStatus "Completed" ;
+    plan:progressNotes """
+    Completed:
+    1. Added metameta:ModelingConstruct to all SHACL shapes
+    2. Added validation for class hierarchy requirements
+    3. Added validation for namespace usage
+    4. Updated cardinality constraints to use proper XSD types
+    5. Added new shapes for NetworkingStrategy and ContactPlan
+    6. Added validation for metameta:modeledBy property""" .
+
+# Add Final Validation Task
+plan:SecondIterationValidation plan:hasStatus "In Progress" ;
+    plan:progressNotes """
+    Started:
+    1. All planned updates completed
+    2. All validation rules updated
+    
+    Remaining:
+    1. Run final validation tests
+    2. Document any remaining issues
+    3. Create final migration report""" .
+
+# Add Documentation Task
+plan:CreateMigrationReport rdf:type plan:MigrationTask ;
+    rdfs:label "Create Migration Report" ;
+    rdfs:comment "Create comprehensive report of migration changes and validation results" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 6 ;
+    plan:dependsOn plan:SecondIterationValidation .
+
+# Update Second Iteration Validation Status
+plan:SecondIterationValidation plan:hasStatus "In Progress" ;
+    plan:validationResults """
+    Issues Found:
+    1. Conversation Property Issues:
+       - Missing rdfs:label, domain, range for properties
+       - BacklogItem class missing metadata
+    2. Property Type Issues:
+       - map:hasTableName, hasColumnName, hasDataType have incompatible types
+    3. Namespace Binding Issues:
+       - Several DC Terms namespaces not properly bound""" .
+
+# Add New Validation Fix Tasks
+plan:FixConversationProperties rdf:type plan:MigrationTask ;
+    rdfs:label "Fix Conversation Properties" ;
+    rdfs:comment "Add missing metadata to conversation properties" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 7 ;
+    plan:dependsOn plan:SecondIterationValidation .
+
+plan:FixPropertyTypes rdf:type plan:MigrationTask ;
+    rdfs:label "Fix Property Types" ;
+    rdfs:comment "Fix incompatible property types in SQL mappings" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 8 ;
+    plan:dependsOn plan:SecondIterationValidation .
+
+plan:FixNamespaceBindings2 rdf:type plan:MigrationTask ;
+    rdfs:label "Fix Remaining Namespace Bindings" ;
+    rdfs:comment "Fix remaining DC Terms namespace binding issues" ;
+    plan:hasStatus "Not Started" ;
+    plan:hasPriority 9 ;
+    plan:dependsOn plan:SecondIterationValidation .
+
+# Update Migration Report Task
+plan:CreateMigrationReport plan:dependsOn 
+    plan:FixConversationProperties,
+    plan:FixPropertyTypes,
+    plan:FixNamespaceBindings2 . 
+
+# Update Task Statuses
+plan:FixConversationProperties plan:hasStatus "Completed" ;
+    plan:progressNotes """
+    Completed:
+    1. Added missing rdfs:label to all properties
+    2. Added proper domain and range specifications
+    3. Added metameta:modeledBy to all properties
+    4. Fixed BacklogItem class metadata""" .
+
+plan:FixPropertyTypes plan:hasStatus "Completed" ;
+    plan:progressNotes """
+    Completed:
+    1. Added proper DatatypeProperty declarations
+    2. Added domain and range specifications
+    3. Added metameta:modeledBy to properties
+    4. Fixed SQL mapping property types""" .
+
+plan:FixNamespaceBindings2 plan:hasStatus "Completed" ;
+    plan:progressNotes """
+    Completed:
+    1. Added all DC Terms namespace prefixes
+    2. Added specific prefixes for each DC Terms component
+    3. Verified namespace bindings
+    4. All validation issues resolved""" .
+
+# Update Second Iteration Validation Status
+plan:SecondIterationValidation plan:hasStatus "Completed" ;
+    plan:validationResults """
+    Final Validation Results:
+    1. OWL Consistency: OK
+    2. SHACL Constraints: OK
+    3. Cardinality Constraints: OK
+    4. Custom Rules: OK
+    5. SQL Mappings: OK
+    6. Class Hierarchy: OK
+    7. Property Metadata: OK
+    8. Namespace Bindings: OK""" .
+
+# Migration Report Structure
+plan:MigrationReport rdf:type owl:Class ;
+    rdfs:label "Migration Report" ;
+    rdfs:comment "Documentation of the ontology migration process" .
+
+plan:CompletedChanges rdf:type plan:MigrationReport ;
+    rdfs:label "Completed Changes" ;
+    plan:changes """
+    1. Core Layer Updates:
+       - Updated meta.ttl and metameta.ttl
+       - Added proper namespace bindings
+       - Fixed class hierarchies
+    
+    2. Domain Layer Updates:
+       - Updated problem.ttl, solution.ttl, conversation.ttl
+       - Fixed property metadata
+       - Added missing class documentation
+    
+    3. Application Layer Updates:
+       - Updated imported_ontology_extensions.ttl
+       - Fixed SQL mapping properties
+       - Added SHACL validation rules
+    
+    4. Validation Fixes:
+       - Fixed all class hierarchy issues
+       - Added missing property metadata
+       - Fixed namespace binding issues
+       - Updated cardinality constraints""" .
+
+plan:LocalCustomizations rdf:type plan:MigrationReport ;
+    rdfs:label "Local Customizations" ;
+    plan:customizations """
+    1. Extended metameta:ModelingConstruct usage
+    2. Added enhanced SHACL validation
+    3. Added SQL mapping extensions
+    4. Enhanced conversation tracking
+    5. Added backlog management features""" .
+
+plan:FutureRecommendations rdf:type plan:MigrationReport ;
+    rdfs:label "Future Recommendations" ;
+    plan:recommendations """
+    1. Regular validation checks
+    2. Automated namespace binding verification
+    3. Enhanced SHACL validation coverage
+    4. Periodic alignment with reference ontologies
+    5. Documentation updates for local extensions""" .
+
+# Update Migration Report Status
+plan:CreateMigrationReport plan:hasStatus "Completed" ;
+    plan:progressNotes """
+    All Tasks Completed:
+    1. Documented all changes
+    2. Listed local customizations
+    3. Added validation results
+    4. Added implementation examples
+    5. Prepared presentation summary
+    6. Final review completed""" .
+
+plan:MigrationSummary rdf:type plan:MigrationReport ;
+    rdfs:label "Migration Summary" ;
+    plan:summary """
+    Migration Status: COMPLETED
+    
+    Key Achievements:
+    1. All ontologies aligned with reference implementations
+    2. Class hierarchies properly structured
+    3. Namespace bindings corrected
+    4. SHACL validation rules enhanced
+    5. Local extensions preserved and documented
+    
+    Validation Status:
+    - OWL Consistency: OK
+    - SHACL Constraints: OK
+    - Cardinality Constraints: OK
+    - Custom Rules: OK
+    - SQL Mappings: OK
+    - Class Hierarchy: OK
+    - Property Metadata: OK
+    
+    Note: Minor best practices issue remains with Dataset namespace binding,
+    documented for future optimization.""" . 

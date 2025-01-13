@@ -12,7 +12,7 @@ sol:SolutionOntology rdf:type owl:Ontology ;
     dc:title "Solution Ontology" ;
     dc:version "1.1" ;
     rdfs:comment "Updated to include solutions for interdisciplinary collaboration." ;
-    owl:imports <./meta> .
+    owl:imports <./meta>, <./problem> .
 
 # Core Classes
 sol:TechnicalSolution rdf:type owl:Class ;

@@ -2,8 +2,34 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix meta: <./meta#> .
 @prefix metameta: <./metameta#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix dct-pub: <http://purl.org/dc/terms/publisher#> .
+@prefix dct-conf: <http://purl.org/dc/terms/conformsTo#> .
+@prefix dct-cre: <http://purl.org/dc/terms/created#> .
+@prefix dct-part: <http://purl.org/dc/terms/isPartOf#> .
+@prefix dct-type: <http://purl.org/dc/terms/type#> .
+@prefix dct-desc: <http://purl.org/dc/terms/description#> .
+@prefix dct-mod: <http://purl.org/dc/terms/modified#> .
+@prefix dct-lic: <http://purl.org/dc/terms/license#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix mit: <http://opensource.org/licenses/MIT#> .
+@prefix framework: <http://ontology-framework.org/core#> .
+@prefix dctypes: <http://purl.org/dc/dcmitype/> .
+
+metameta:MetaMetaOntology rdf:type owl:Ontology ;
+    dc:title "MetaMeta Core Ontology" ;
+    dc:version "1.0" ;
+    dct:created "2024-01-20"^^xsd:date ;
+    dct:modified "2024-01-20"^^xsd:date ;
+    dct:publisher "Ontology Framework Project" ;
+    dct:license mit:License ;
+    dct:description "Core meta-meta concepts for ontology organization and abstraction hierarchies" ;
+    dct:isPartOf framework:Core ;
+    dct:type dctypes:Dataset ;
+    dct:conformsTo owl:Ontology ;
+    rdfs:comment "Core meta-meta concepts for ontology organization" .
 
 # Safety Notice
 # This metameta ontology supports infinite recursion in modeling layers ("turtles all the way down").

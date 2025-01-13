@@ -17,11 +17,55 @@
         "titleBar.activeBackground": "#c34bf3",
         "titleBar.activeForeground": "#15202b",
         "titleBar.inactiveBackground": "#c34bf399",
-        "titleBar.inactiveForeground": "#15202b99"
+        "titleBar.inactiveForeground": "#15202b99",
+        "terminal.background": "#002B36",
+        "terminal.foreground": "#839496",
+        "terminal.ansiBlack": "#073642",
+        "terminal.ansiBlue": "#268BD2",
+        "terminal.ansiBrightBlack": "#002B36",
+        "terminal.ansiBrightBlue": "#839496",
+        "terminal.ansiBrightCyan": "#93A1A1",
+        "terminal.ansiBrightGreen": "#586E75",
+        "terminal.ansiBrightMagenta": "#6C71C4",
+        "terminal.ansiBrightRed": "#CB4B16",
+        "terminal.ansiBrightWhite": "#FDF6E3",
+        "terminal.ansiBrightYellow": "#657B83",
+        "terminal.ansiCyan": "#2AA198",
+        "terminal.ansiGreen": "#859900",
+        "terminal.ansiMagenta": "#D33682",
+        "terminal.ansiRed": "#DC322F",
+        "terminal.ansiWhite": "#EEE8D5",
+        "terminal.ansiYellow": "#B58900",
+        "terminal.selectionBackground": "#073642",
+        "terminalCursor.background": "#839496",
+        "terminalCursor.foreground": "#839496"
     },
     "peacock.color": "#c34bf3",
     "python.analysis.extraPaths": [
         "/Users/lou/miniconda3/envs/ice_breaker/lib/python3.11/site-packages"
     ],
-    "dbt.dbtIntegration": "cloud"
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "python.languageServer": "Pylance",
+    "dbt.dbtIntegration": "cloud",
+    "terminal.integrated.fontFamily": "Monaco",
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.lineHeight": 1.2,
+    "terminal.integrated.fontWeight": "normal",
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.cursorStyle": "line",
+    "terminal.integrated.defaultProfile.osx": "bash",
+    "terminal.integrated.scrollback": 10000,
+    "terminal.integrated.minimumContrastRatio": 4.5,
+    "terminal.integrated.tabs.enabled": true,
+    "terminal.integrated.gpuAcceleration": "on",
+    "terminal.integrated.rightClickBehavior": "selectWord",
+    "terminal.integrated.shellIntegration.enabled": true,
+    "terminal.integrated.profiles.osx": {
+        "bash": {
+            "path": "/usr/local/bin/bash",
+            "args": []
+        }
+    }
 }

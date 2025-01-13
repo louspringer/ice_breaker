@@ -2,7 +2,7 @@ from snowflake.snowpark import Session
 import pandas as pd
 
 # Establish a Snowpark session using the default connection profile
-session = Session.builder.configs("default").create()
+session = Session.builder.configs({"connection_name": "default"}).create()
 
 # Load the Contact and InteractionPoint tables into Snowpark DataFrames
 contact_df = session.table("Contact")

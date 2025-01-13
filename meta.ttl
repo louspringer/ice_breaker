@@ -10,7 +10,7 @@
 meta:Person rdf:type owl:Class ;
     rdfs:subClassOf owl:Thing ;
     rdfs:label "Person" ;
-    rdfs:comment "A human individual" .
+    rdfs:comment "A human being" .
 
 meta:AbstractConcept rdf:type owl:Class ;
     rdfs:subClassOf owl:Thing ;
@@ -70,22 +70,15 @@ meta:hasPosition rdf:type owl:ObjectProperty ;
     rdfs:label "has position" ;
     owl:maxCardinality "1"^^xsd:nonNegativeInteger .
 
-# Add missing property labels
-meta:hasLevel rdfs:label "has level" .
-meta:hasContext rdfs:label "has context" .
-meta:hasConstraint rdfs:label "has constraint" .
-meta:hasValue rdfs:label "has value" .
-meta:hasPriority rdfs:label "has priority" .
+meta:hasLevel rdf:type owl:DatatypeProperty ;
+    rdfs:label "has level" ;
+    rdfs:comment "Specifies the level of an entity" ;
+    rdfs:domain meta:AbstractConcept ;
+    rdfs:range xsd:integer .
 
 # Core Ontology
 meta:CoreOntology rdf:type owl:Ontology ;
     dc:title "Core Meta Ontology" ;
     dc:version "1.0" ;
     owl:versionInfo "1.0" ;
-    rdfs:comment "Core concepts shared across domain ontologies" .
-
-meta:hasLevel rdf:type owl:DatatypeProperty ;
-    rdfs:label "has level" ;
-    rdfs:comment "Specifies the level of an entity" ;
-    rdfs:domain meta:AbstractConcept ;
-    rdfs:range xsd:integer . 
+    rdfs:comment "Core concepts shared across domain ontologies" . 

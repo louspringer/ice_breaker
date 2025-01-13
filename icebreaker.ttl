@@ -4,92 +4,97 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
 # Local ontology prefixes
 @prefix prob: <./problem#> .
 @prefix sol: <./solution#> .
-@prefix conversation: <./conversation#> .
+@prefix conv: <./conversation#> .
 @prefix meta: <./meta#> .
 @prefix metameta: <./metameta#> .
 @prefix icebreaker: <./icebreaker#> .
-@prefix map: <./map#> .
+@prefix map: <./ontology_sql_mappings#> .
 
 icebreaker:IcebreakerOntology rdf:type owl:Ontology ;
     dc:title "Icebreaker Ontology" ;
     dc:version "1.1" ;
+    dct:created "2024-01-20"^^xsd:date ;
+    dct:modified "2024-01-20"^^xsd:date ;
     rdfs:comment "Ontology for managing cold contact networking and relationship building" ;
-    owl:imports <./problem> ;
-    owl:imports <./solution> ;
-    owl:imports <./meta> ;
-    owl:imports <./metameta> ;
-    owl:imports <./imported_ontology_extensions> ;
+    owl:imports <./problem>, <./solution>, <./meta>, <./metameta>, <./imported_ontology_extensions> ;
     owl:versionInfo "Updated with SHACL shapes and OWL restrictions" .
 
 # Core Classes with Enhanced Definitions
 icebreaker:Contact rdf:type owl:Class ;
     rdfs:label "Contact" ;
     rdfs:comment "A person who is a potential or existing networking contact" ;
-    rdfs:subClassOf meta:Person ;
+    rdfs:subClassOf meta:Person, metameta:ModelingConstruct ;
     rdfs:subClassOf [
         rdf:type owl:Restriction ;
         owl:onProperty icebreaker:hasNetworkingDegree ;
-        owl:cardinality 1
+        owl:cardinality "1"^^xsd:nonNegativeInteger
     ] ;
     rdfs:subClassOf [
         rdf:type owl:Restriction ;
         owl:onProperty icebreaker:contactEmail ;
-        owl:maxCardinality 1
+        owl:maxCardinality "1"^^xsd:nonNegativeInteger
     ] .
 
 icebreaker:NetworkingDegree rdf:type owl:Class ;
     rdfs:label "Networking Degree" ;
     rdfs:comment "Classification of contact relationship (1st degree, 2nd degree, etc.)" ;
-    rdfs:subClassOf meta:Classification .
+    rdfs:subClassOf meta:Classification, metameta:ModelingConstruct .
 
 icebreaker:InteractionPoint rdf:type owl:Class ;
     rdfs:label "Interaction Point" ;
-    rdfs:comment "A specific interaction or touchpoint with a contact" ;
-    rdfs:subClassOf conversation:Interaction .
+    rdfs:comment "A point of interaction with a contact" ;
+    rdfs:subClassOf meta:Event, metameta:ModelingConstruct .
 
 icebreaker:ResearchInsight rdf:type owl:Class ;
     rdfs:label "Research Insight" ;
     rdfs:comment "Information gathered about a contact for conversation preparation" ;
-    rdfs:subClassOf prob:Information .
+    rdfs:subClassOf prob:Information, metameta:ModelingConstruct .
 
 icebreaker:CommonGround rdf:type owl:Class ;
     rdfs:label "Common Ground" ;
     rdfs:comment "Shared experiences, interests, or connections between contacts" ;
-    rdfs:subClassOf meta:SharedContext .
+    rdfs:subClassOf meta:SharedContext, metameta:ModelingConstruct .
 
 # Enhanced Properties with Characteristics
 icebreaker:hasNetworkingDegree rdf:type owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain icebreaker:Contact ;
     rdfs:range icebreaker:NetworkingDegree ;
     rdfs:label "has networking degree" ;
-    rdfs:comment "Specifies the networking relationship degree with a contact" .
+    rdfs:comment "Specifies the networking relationship degree with a contact" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 icebreaker:hasInteraction rdf:type owl:ObjectProperty ;
     rdfs:domain icebreaker:Contact ;
     rdfs:range icebreaker:InteractionPoint ;
     rdfs:label "has interaction" ;
     rdfs:comment "Links a contact to their interaction history" ;
-    owl:inverseOf icebreaker:interactionWith .
+    owl:inverseOf icebreaker:interactionWith ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 icebreaker:interactionWith rdf:type owl:ObjectProperty ;
     rdfs:domain icebreaker:InteractionPoint ;
     rdfs:range icebreaker:Contact ;
     rdfs:label "interaction with" ;
-    rdfs:comment "Links an interaction to the contact involved" .
+    rdfs:comment "Links an interaction to the contact involved" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 icebreaker:sharesCommonGround rdf:type owl:ObjectProperty, owl:SymmetricProperty ;
     rdfs:domain icebreaker:Contact ;
     rdfs:range icebreaker:CommonGround ;
     rdfs:label "shares common ground" ;
-    rdfs:comment "Links contacts through shared experiences or interests" .
+    rdfs:comment "Links contacts through shared experiences or interests" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 # SHACL Shapes for Validation
 icebreaker:ContactShape rdf:type sh:NodeShape ;
     sh:targetClass icebreaker:Contact ;
+    metameta:modeledBy metameta:ModelingConstruct ;
     sh:property [
         sh:path icebreaker:contactEmail ;
         sh:datatype xsd:string ;
@@ -103,49 +108,88 @@ icebreaker:ContactShape rdf:type sh:NodeShape ;
         sh:pattern "^https://www\\.linkedin\\.com/.*$" ;
         sh:maxCount 1 ;
         sh:message "Contact must have a valid LinkedIn URL"
+    ] ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:hasValue metameta:ModelingConstruct ;
+        sh:message "Contact must be a ModelingConstruct"
     ] .
 
 icebreaker:InteractionShape rdf:type sh:NodeShape ;
     sh:targetClass icebreaker:InteractionPoint ;
+    metameta:modeledBy metameta:ModelingConstruct ;
     sh:property [
         sh:path icebreaker:lastInteractionDate ;
         sh:datatype xsd:dateTime ;
         sh:maxCount 1 ;
         sh:message "Interaction must have a valid date"
+    ] ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:hasValue metameta:ModelingConstruct ;
+        sh:message "InteractionPoint must be a ModelingConstruct"
+    ] .
+
+icebreaker:NetworkingStrategyShape rdf:type sh:NodeShape ;
+    sh:targetClass icebreaker:NetworkingStrategy ;
+    metameta:modeledBy metameta:ModelingConstruct ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:hasValue metameta:ModelingConstruct ;
+        sh:message "NetworkingStrategy must be a ModelingConstruct"
+    ] .
+
+icebreaker:ContactPlanShape rdf:type sh:NodeShape ;
+    sh:targetClass icebreaker:ContactPlan ;
+    metameta:modeledBy metameta:ModelingConstruct ;
+    sh:property [
+        sh:path icebreaker:targetContact ;
+        sh:class icebreaker:Contact ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:message "ContactPlan must have exactly one target contact"
+    ] ;
+    sh:property [
+        sh:path rdf:type ;
+        sh:hasValue metameta:ModelingConstruct ;
+        sh:message "ContactPlan must be a ModelingConstruct"
     ] .
 
 # Integration with Solution Patterns
 icebreaker:NetworkingStrategy rdf:type owl:Class ;
     rdfs:label "Networking Strategy" ;
     rdfs:comment "A strategy for building and maintaining professional relationships" ;
-    rdfs:subClassOf sol:Strategy .
+    rdfs:subClassOf sol:Strategy, metameta:ModelingConstruct .
 
 icebreaker:ContactPlan rdf:type owl:Class ;
     rdfs:label "Contact Plan" ;
     rdfs:comment "A planned approach for engaging with a specific contact" ;
-    rdfs:subClassOf sol:Plan ;
+    rdfs:subClassOf sol:Plan, metameta:ModelingConstruct ;
     rdfs:subClassOf [
         rdf:type owl:Restriction ;
         owl:onProperty icebreaker:targetContact ;
-        owl:cardinality 1
+        owl:cardinality "1"^^xsd:nonNegativeInteger
     ] .
 
 icebreaker:targetContact rdf:type owl:ObjectProperty, owl:FunctionalProperty ;
     rdfs:domain icebreaker:ContactPlan ;
     rdfs:range icebreaker:Contact ;
     rdfs:label "target contact" ;
-    rdfs:comment "The contact this plan is designed for" .
+    rdfs:comment "The contact this plan is designed for" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 # Enhanced Individuals with Better Integration
 icebreaker:FirstDegree rdf:type icebreaker:NetworkingDegree, owl:NamedIndividual ;
     rdfs:label "First Degree Connection" ;
     rdfs:comment "Direct connection in network" ;
-    meta:priority "1"^^xsd:integer .
+    meta:priority "1"^^xsd:integer ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 icebreaker:SecondDegree rdf:type icebreaker:NetworkingDegree, owl:NamedIndividual ;
     rdfs:label "Second Degree Connection" ;
     rdfs:comment "Connection through one intermediary" ;
-    meta:priority "2"^^xsd:integer .
+    meta:priority "2"^^xsd:integer ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 # Temporal Tracking
 icebreaker:TemporalTracking rdf:type owl:Class ;

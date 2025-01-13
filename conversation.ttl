@@ -2,68 +2,85 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix conversation: <./conversation#> .
+@prefix conv: <./conversation#> .
+@prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
-conversation:ConversationOntology rdf:type owl:Ontology ;
-    dc:title "Conversation Ontology" ;
-    dc:version "1.0" .
+conv:ConversationOntology rdf:type owl:Ontology ;
+    dc:title "Conversation and Backlog Management Ontology" ;
+    dc:version "1.0" ;
+    owl:imports <./meta>, <./metameta> .
 
 # Core Classes
-conversation:Conversation rdf:type owl:Class ;
+conv:BacklogItem rdf:type owl:Class ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
+    rdfs:label "Backlog Item" ;
+    rdfs:comment "A work item in the project backlog that needs to be addressed" .
+
+conv:Conversation rdf:type owl:Class ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
     rdfs:label "Conversation" ;
-    rdfs:comment "A class representing a conversation." .
+    rdfs:comment "A class representing a conversation" .
 
-conversation:Message rdf:type owl:Class ;
+conv:Message rdf:type owl:Class ;
+    rdfs:subClassOf metameta:ModelingConstruct ;
     rdfs:label "Message" ;
-    rdfs:comment "A class representing a message in the conversation." .
+    rdfs:comment "A class representing a message in the conversation" .
 
-conversation:hasMessage rdf:type owl:ObjectProperty ;
+# Core Properties
+conv:hasMessage rdf:type owl:ObjectProperty ;
     rdfs:label "has message" ;
-    rdfs:domain conversation:Conversation ;
-    rdfs:range conversation:Message ;
-    rdfs:comment "Relates a conversation to its messages." .
+    rdfs:domain conv:Conversation ;
+    rdfs:range conv:Message ;
+    rdfs:comment "Relates a conversation to its messages" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
-conversation:content rdf:type owl:DatatypeProperty ;
+conv:content rdf:type owl:DatatypeProperty ;
     rdfs:label "content" ;
-    rdfs:domain conversation:Message ;
+    rdfs:domain conv:Message ;
     rdfs:range xsd:string ;
-    rdfs:comment "The textual content of a message." .
+    rdfs:comment "The textual content of a message" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
-conversation:timestamp rdf:type owl:DatatypeProperty ;
+conv:timestamp rdf:type owl:DatatypeProperty ;
     rdfs:label "timestamp" ;
-    rdfs:domain conversation:Conversation ;
+    rdfs:domain conv:Conversation ;
     rdfs:range xsd:dateTime ;
-    rdfs:comment "The timestamp indicating when the conversation took place." .
+    rdfs:comment "The timestamp indicating when the conversation took place" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
-conversation:participants rdf:type owl:DatatypeProperty ;
+conv:participants rdf:type owl:DatatypeProperty ;
     rdfs:label "participants" ;
-    rdfs:domain conversation:Conversation ;
+    rdfs:domain conv:Conversation ;
     rdfs:range xsd:string ;
-    rdfs:comment "A list of participants involved in the conversation." .
+    rdfs:comment "A list of participants involved in the conversation" ;
+    metameta:modeledBy metameta:ModelingConstruct .
 
 # Instance of the conversation
-conversation:Conversation1 rdf:type conversation:Conversation ;
-    conversation:hasMessage conversation:Message1, conversation:Message2, conversation:Message3, 
-                          conversation:Message4, conversation:Message5, conversation:Message6 ;
-    conversation:timestamp "2024-12-19T00:00:00Z"^^xsd:dateTime ;
-    conversation:participants "User, Assistant" ;
-    rdfs:comment "An instance of the conversation between the user and the assistant." .
+conv:Conversation1 rdf:type conv:Conversation ;
+    conv:hasMessage conv:Message1, conv:Message2, conv:Message3, 
+                   conv:Message4, conv:Message5, conv:Message6 ;
+    conv:timestamp "2024-12-19T00:00:00Z"^^xsd:dateTime ;
+    conv:participants "User, Assistant" ;
+    rdfs:comment "An instance of the conversation between the user and the assistant" .
 
-conversation:Message1 rdf:type conversation:Message ;
-    conversation:content """In ontologies, particularly Turtle, languages are represented using a graph-based structure that allows defining rich relationships between concepts.""" .
+conv:Message1 rdf:type conv:Message ;
+    conv:content """In ontologies, particularly Turtle, languages are represented using a graph-based structure that allows defining rich relationships between concepts.""" .
 
-conversation:Message2 rdf:type conversation:Message ;
-    conversation:content """Sure! Turtle is one format for expressing RDF (Resource Description Framework) data, which is useful for representing semantic web information.""" .
+conv:Message2 rdf:type conv:Message ;
+    conv:content """Sure! Turtle is one format for expressing RDF (Resource Description Framework) data, which is useful for representing semantic web information.""" .
 
-conversation:Message3 rdf:type conversation:Message ;
-    conversation:content """Exactly! Since the underlying data model is the same, you can convert between these formats without losing any semantic information.""" .
+conv:Message3 rdf:type conv:Message ;
+    conv:content """Exactly! Since the underlying data model is the same, you can convert between these formats without losing any semantic information.""" .
 
-conversation:Message4 rdf:type conversation:Message ;
-    conversation:content """No, they don't. The conventions for increasing readability in Turtle, like using prefixes, indentation, and comments, don't affect the underlying data.""" .
+conv:Message4 rdf:type conv:Message ;
+    conv:content """No, they don't. The conventions for increasing readability in Turtle, like using prefixes, indentation, and comments, don't affect the underlying data.""" .
 
-conversation:Message5 rdf:type conversation:Message ;
-    conversation:content "Let me know what specific concepts or relationships you'd like included in the ontology." .
+conv:Message5 rdf:type conv:Message ;
+    conv:content "Let me know what specific concepts or relationships you'd like included in the ontology." .
 
-conversation:Message6 rdf:type conversation:Message ;
-    conversation:content """Include our dialog from the beginning in the instance specification, including the explanations of ontologies and different modeling capabilities.""" .
+conv:Message6 rdf:type conv:Message ;
+    conv:content """Include our dialog from the beginning in the instance specification, including the explanations of ontologies and different modeling capabilities.""" .

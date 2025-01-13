@@ -1,0 +1,83 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix map: <./ontology_framework_mapping#> .
+@prefix meta: <./meta#> .
+@prefix metameta: <./metameta#> .
+@prefix prob: <./problem#> .
+@prefix sol: <./solution#> .
+@prefix conv: <./conversation#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+
+map:MappingOntology rdf:type owl:Ontology ;
+    dc:title "Ontology Framework Mapping" ;
+    dc:version "1.0" ;
+    rdfs:comment "Maps differences between local and reference ontologies" .
+
+# Core Classes
+map:OntologyMapping rdf:type owl:Class ;
+    rdfs:label "Ontology Mapping" ;
+    rdfs:comment "Maps between local and reference ontology elements" .
+
+map:DifferenceType rdf:type owl:Class ;
+    rdfs:label "Difference Type" ;
+    rdfs:comment "Type of difference between ontologies" .
+
+# Properties
+map:hasLocalPath rdf:type owl:DatatypeProperty ;
+    rdfs:domain map:OntologyMapping ;
+    rdfs:range xsd:string ;
+    rdfs:label "has local path" ;
+    rdfs:comment "Path to local ontology file" .
+
+map:hasReferencePath rdf:type owl:DatatypeProperty ;
+    rdfs:domain map:OntologyMapping ;
+    rdfs:range xsd:string ;
+    rdfs:label "has reference path" ;
+    rdfs:comment "Path to reference ontology file" .
+
+map:hasDifferenceType rdf:type owl:ObjectProperty ;
+    rdfs:domain map:OntologyMapping ;
+    rdfs:range map:DifferenceType ;
+    rdfs:label "has difference type" ;
+    rdfs:comment "Type of difference between ontologies" .
+
+# Difference Types
+map:Addition rdf:type map:DifferenceType ;
+    rdfs:label "Addition" ;
+    rdfs:comment "Local addition not present in reference" .
+
+map:Modification rdf:type map:DifferenceType ;
+    rdfs:label "Modification" ;
+    rdfs:comment "Modified from reference implementation" .
+
+map:Extension rdf:type map:DifferenceType ;
+    rdfs:label "Extension" ;
+    rdfs:comment "Extension of reference implementation" .
+
+# Mappings
+map:MetaMapping rdf:type map:OntologyMapping ;
+    map:hasLocalPath "./meta.ttl" ;
+    map:hasReferencePath "../ontology-framework/meta.ttl" ;
+    map:hasDifferenceType map:Modification .
+
+map:MetametaMapping rdf:type map:OntologyMapping ;
+    map:hasLocalPath "./metameta.ttl" ;
+    map:hasReferencePath "../ontology-framework/metameta.ttl" ;
+    map:hasDifferenceType map:Extension .
+
+map:ProblemMapping rdf:type map:OntologyMapping ;
+    map:hasLocalPath "./problem.ttl" ;
+    map:hasReferencePath "../ontology-framework/problem.ttl" ;
+    map:hasDifferenceType map:Modification .
+
+map:SolutionMapping rdf:type map:OntologyMapping ;
+    map:hasLocalPath "./solution.ttl" ;
+    map:hasReferencePath "../ontology-framework/solution.ttl" ;
+    map:hasDifferenceType map:Extension .
+
+map:ConversationMapping rdf:type map:OntologyMapping ;
+    map:hasLocalPath "./conversation.ttl" ;
+    map:hasReferencePath "../ontology-framework/conversation.ttl" ;
+    map:hasDifferenceType map:Extension . 
